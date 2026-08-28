@@ -602,9 +602,9 @@ function refreshBrands(){
     const g=document.createElement("optgroup");g.label={FR:"Françaises",EU:"Européennes",US:"Américaines",AS:"Asiatiques / Chinoises"}[z];
     list.sort((a,b)=>a.n.localeCompare(b.n)).forEach(b=>{const o=document.createElement("option");o.value=b.n;o.textContent=b.n;g.appendChild(o)});
     if(g.children.length)sel.appendChild(g)});
-  ("selModel").innerHTML=′<optionvalue="">Seˊlectionnezunemarque</option>′;("selModel").innerHTML='<option value="">Sélectionnez une marque</option>';("selModel").innerHTML=′<optionvalue="">Seˊlectionnezunemarque</option>′;("selEngine").innerHTML='<option value="">Sélectionnez un modèle</option>';$("selEngine").disabled=true;
+  ("selModel").innerHTML=′<optionvalue="">Selectionnezunemarque</option>′;("selModel").innerHTML='<option value="">Sélectionnez une marque</option>';("selModel").innerHTML=′<optionvalue="">Selectionnezunemarque</option>′;("selEngine").innerHTML='<option value="">Sélectionnez un modèle</option>';$("selEngine").disabled=true;
 
-  ("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").innerHTML='<option value="">Sélectionnez un modèle</option>';("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").disabled=true;
+  ("selEngine").innerHTML=′<optionvalue="">Selectionnezunmodele</option>′;("selEngine").innerHTML='<option value="">Sélectionnez un modèle</option>';("selEngine").innerHTML=′<optionvalue="">Selectionnezunmodele</option>′;("selEngine").disabled=true;
     
   
 }
@@ -615,7 +615,7 @@ $("selBrand").addEventListener("change",()=>{
   if(models){sel.innerHTML='<option value="">— Choisir un modèle —</option>';
     Object.keys(models).sort().forEach(m=>{const o=document.createElement("option");o.value=m;o.textContent=m;sel.appendChild(o)})}
   else{sel.innerHTML='<option value="__custom">— Modèle (saisie libre) —</option>'}
-  ("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").innerHTML='<option value="">Sélectionnez un modèle</option>';("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").disabled=true;
+  ("selEngine").innerHTML=′<optionvalue="">Selectionnezunmodele</option>′;("selEngine").innerHTML='<option value="">Sélectionnez un modèle</option>';("selEngine").innerHTML=′<optionvalue="">Selectionnezunmodele</option>′;("selEngine").disabled=true;
 });
 $("selModel").addEventListener("change",()=>{
   const b=("selBrand").value,m=("selBrand").value,m=("selBrand").value,m=("selModel").value,sel=$("selEngine");
