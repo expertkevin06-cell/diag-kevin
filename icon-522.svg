@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a0e0e"/><stop offset="1" stop-color="#2b0606"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffc44d"/><stop offset="1" stop-color="#e8930f"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <circle cx="256" cy="270" r="180" fill="#6b1111" opacity="0.55"/>
+  <path d="M96 330 L128 246 Q142 208 192 196 L298 182 Q362 176 406 232 L428 330 Q434 352 410 352 L112 352 Q94 352 96 330 Z" fill="url(#body)"/>
+  <path d="M158 246 L182 208 Q192 200 216 198 L296 190 Q330 190 352 218 L368 246 Z" fill="#1a0505" opacity="0.85"/>
+  <rect x="252" y="192" width="10" height="54" fill="#4a0e0e" opacity="0.6"/>
+  <rect x="100" y="296" width="34" height="12" rx="6" fill="#ff5252"/>
+  <rect x="392" y="294" width="30" height="12" rx="6" fill="#fff3d6"/>
+  <circle cx="158" cy="356" r="46" fill="#1a0505" stroke="#0d0202" stroke-width="8"/>
+  <circle cx="158" cy="356" r="20" fill="none" stroke="#f5a524" stroke-width="7"/>
+  <circle cx="368" cy="356" r="46" fill="#1a0505" stroke="#0d0202" stroke-width="8"/>
+  <circle cx="368" cy="356" r="20" fill="none" stroke="#f5a524" stroke-width="7"/>
+  <ellipse cx="262" cy="408" rx="190" ry="14" fill="#120202" opacity="0.6"/>
+  <text x="256" y="478" font-family="Arial, Helvetica, sans-serif" font-size="52" font-weight="700" fill="#f5a524" text-anchor="middle" letter-spacing="4">DK</text>
+</svg>
