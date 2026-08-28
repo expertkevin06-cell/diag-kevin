@@ -602,8 +602,11 @@ function refreshBrands(){
     const g=document.createElement("optgroup");g.label={FR:"Françaises",EU:"Européennes",US:"Américaines",AS:"Asiatiques / Chinoises"}[z];
     list.sort((a,b)=>a.n.localeCompare(b.n)).forEach(b=>{const o=document.createElement("option");o.value=b.n;o.textContent=b.n;g.appendChild(o)});
     if(g.children.length)sel.appendChild(g)});
-  ("selModel").innerHTML=′<optionvalue="">Seˊlectionnezunemarque</option>′;("selModel").innerHTML='<option value="">Sélectionnez une marque</option>';("selModel").innerHTML=′<optionvalue="">Seˊlectionnezunemarque</option>′;("selModel").disabled=true;
+  ("selModel").innerHTML=′<optionvalue="">Seˊlectionnezunemarque</option>′;("selModel").innerHTML='<option value="">Sélectionnez une marque</option>';("selModel").innerHTML=′<optionvalue="">Seˊlectionnezunemarque</option>′;("selEngine").innerHTML='<option value="">Sélectionnez un modèle</option>';$("selEngine").disabled=true;
+
   ("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").innerHTML='<option value="">Sélectionnez un modèle</option>';("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").disabled=true;
+    
+  
 }
 document.querySelectorAll("#regionChecks input").forEach(i=>i.addEventListener("change",refreshBrands));
 $("selBrand").addEventListener("change",()=>{
