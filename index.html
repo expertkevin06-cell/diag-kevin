@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2b0606">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Diag Kevin — Base pannes & rappels</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon-512.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#140808; --panel:#1d1010; --panel2:#261515; --line:#3d2222;
+  --txt:#efe9e2; --dim:#a3968f; --amber:#f5a524; --red:#e05252; --green:#4cb87a;
+  --fh:"Barlow Condensed",sans-serif; --fb:"Archivo",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);min-height:100vh;
+  background-repeat:no-repeat;background-position:center 70px;
+  background-size:min(1050px,96vw) auto;background-attachment:fixed;transition:background-image .4s}
+header{position:sticky;top:0;z-index:50;background:rgba(20,8,8,.93);backdrop-filter:blur(8px);
+  border-bottom:1px var(--line);display:flex;align-items:center;gap:10px;padding:12px 18px;flex-wrap:wrap}
+.logo b{font-family:var(--fh);font-size:25px;letter-spacing:2px;color:var(--amber)}
+.logo span{font-size:11px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-left:8px}
+header .sp{flex:1}
+.btn{background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:8px 14px;
+  border-radius:6px;font-family:var(--fb);font-size:12.5px;font-weight:600;cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--amber)}
+.btn.acc{background:var(--amber);color:#1a0e05;border-color:var(--amber)}
+.btn.sm{padding:6px 10px;font-size:12px}
+.badge{background:var(--red);color:#fff;font-size:10px;border-radius:9px;padding:1px 6px;margin-left:4px;display:none}
+.wrap{max-width:980px;margin:0 auto;padding:24px 18px 90px}
+.hero{padding:36px 0 24px}
+.hero h1{font-family:var(--fh);font-size:clamp(36px,7vw,60px);font-weight:700;line-height:1;text-transform:uppercase}
+.hero h1 em{font-style:normal;color:var(--amber)}
+.hero p{color:var(--dim);max-width:560px;margin-top:10px;font-size:14px;line-height:1.6}
+.statline{display:flex;gap:28px;margin-top:22px;flex-wrap:wrap}
+.stat b{font-family:var(--fh);font-size:28px;color:var(--amber);display:block}
+.stat span{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px;margin-top:16px}
+.card h2{font-family:var(--fh);font-size:20px;letter-spacing:1.5px;text-transform:uppercase;display:flex;gap:10px;margin-bottom:14px}
+.card h2 .n{color:var(--amber)}
+.checks{display:flex;gap:10px;flex-wrap:wrap}
+.chk input{display:none}
+.chk label{display:inline-flex;gap:8px;border:1px solid var(--line);background:var(--panel2);
+  padding:9px 15px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;transition:.15s}
+.chk input:checked+label{border-color:var(--amber);color:var(--amber);background:#2e1c0c}
+select,input[type=text],input[type=password]{width:100%;background:var(--panel2);border:1px solid var(--line);
+  color:var(--txt);padding:11px 13px;border-radius:6px;font-family:var(--fb);font-size:14px;outline:none}
+select:focus,input:focus{border-color:var(--amber)}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+label.fl{display:block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+.hidden{display:none!important}
+.vehgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.veh{border:1px solid var(--line);border-radius:10px;background:var(--panel2);padding:14px;cursor:pointer;
+  text-align:center;transition:.15s}
+.veh:hover{border-color:var(--amber)}
+.veh.on{border-color:var(--amber);background:#2e1c0c;box-shadow:0 0 0 1px var(--amber)}
+.veh svg{width:100%;height:72px}
+.veh b{display:block;font-family:var(--fh);font-size:16px;letter-spacing:1px;margin-top:6px;color:var(--txt)}
+.veh.on b{color:var(--amber)}
+.veh span{font-size:11px;color:var(--dim)}
+.sysTag{display:inline-flex;font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:3px 8px;border-radius:4px;border:1px solid var(--line);color:var(--dim)}
+.s-mec{color:#e8a94a;border-color:#5a4520}.s-ele{color:#7ab8e8;border-color:#28455c}
+.s-sec{color:var(--red);border-color:#5c2b2b}.s-hv{color:#e8734a;border-color:#5c3320}
+.fault{border-top:1px solid var(--line);padding:13px 0}
+.fault:first-of-type{border-top:none}
+.fault h4{font-size:14px;font-weight:600;display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.fault p{font-size:12.5px;color:var(--dim);margin-top:4px;line-height:1.55}
+.pill{font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase}
+.pill.hi{background:#3a1d1d;color:#ff8f8f}.pill.md{background:#38300f;color:#ffce55}.pill.lo{background:#16281c;color:#7fd6a0}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;font-family:var(--fh);letter-spacing:1px;text-transform:uppercase;color:var(--dim);
+  padding:7px 9px;border-bottom:1px solid var(--line)}
+.tbl td{padding:9px;border-bottom:1px solid #2c1a1a;vertical-align:top}
+.tbl td b{color:var(--amber)}
+.srcgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:9px;margin-top:13px}
+.srclink{display:block;border:1px solid var(--line);border-radius:6px;padding:11px;text-decoration:none;color:var(--txt);font-size:12px}
+.srclink:hover{border-color:var(--amber)}
+.srclink b{display:block;color:var(--amber);margin-bottom:2px}
+.srclink span{color:var(--dim);font-size:11px}
+.modal{position:fixed;inset:0;background:rgba(10,3,3,.78);z-index:100;display:none;align-items:center;justify-content:center;padding:18px}
+.modal.open{display:flex}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:100%;max-width:460px;padding:24px;max-height:86vh;overflow:auto}
+.mbox h3{font-family:var(--fh);font-size:21px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;
+  display:flex;justify-content:space-between}
+.mbox h3 button{background:none;border:none;color:var(--dim);font-size:22px;cursor:pointer}
+.reqitem{border:1px solid var(--line);border-radius:6px;padding:11px;margin-top:9px;display:flex;gap:9px;
+  align-items:center;font-size:13px;flex-wrap:wrap}
+.reqitem .sp{flex:1}
+.switch{display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;user-select:none}
+.switch input{display:none}
+.switch .tr{width:40px;height:22px;border-radius:12px;background:var(--line);position:relative;flex-shrink:0;transition:.2s}
+.switch input:checked+.tr{background:var(--amber)}
+.switch .tr::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#140808;top:3px;left:3px;transition:.2s}
+.switch input:checked+.tr::after{left:21px}
+#toasts{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:200;display:flex;
+  flex-direction:column;gap:8px;width:min(420px,92vw)}
+.toast{background:var(--panel2);border:1px solid var(--amber);border-radius:8px;padding:11px 15px;font-size:13px;animation:tin .25s}
+.toast.err{border-color:var(--red)}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px;flex-wrap:wrap}
+.tabs button{background:none;border:none;color:var(--dim);font-family:var(--fh);font-size:14.5px;
+  letter-spacing:1.5px;text-transform:uppercase;padding:9px 12px;cursor:pointer;border-bottom:2px solid transparent}
+.tabs button.on{color:var(--amber);border-bottom-color:var(--amber)}
+.note{font-size:12px;color:var(--dim);line-height:1.55;margin-top:12px;border-left:2px solid var(--line);padding-left:12px}
+footer{border-top:1px solid var(--line);padding:24px 18px;text-align:center;color:var(--dim);font-size:11.5px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><b>DIAG KEVIN</b><span>Diagnostic & rappels</span></div>
+  <div class="sp"></div>
+  <button class="btn sm" id="btnShare">Partager</button>
+  <button class="btn sm acc" id="btnInstall">Installer</button>
+  <button class="btn sm" id="btnPack">Pack APK<span class="badge" id="badge"></span></button>
+  <button class="btn sm" id="btnAdmin">Admin</button>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>Base de diagnostic<br><em>pannes & rappels</em></h1>
+    <p>Choisissez votre type de véhicule, une zone, une marque, un modèle et une motorisation : Diag Kevin croise les pannes connues, les rappels officiels et l'entretien constructeur.</p>
+    <div class="statline">
+      <div class="stat"><b id="stFiches">0</b><span>Fiches en base</span></div>
+      <div class="stat"><b id="stMarques">0</b><span>Marques</span></div>
+      <div class="stat"><b id="stCodes">0</b><span>Codes défauts</span></div>
+      <div class="stat"><b id="stSync">—</b><span>Dernière synchro</span></div>
+    </div>
+  </div>
+
+  <!-- Étape 0 : type de véhicule pré-installé -->
+  <div class="card">
+    <h2><span class="n">00</span> Type de véhicule</h2>
+    <div class="vehgrid" id="vehGrid">
+      <div class="veh" data-v="SUV">
+        <svg viewBox="0 0 200 90" fill="none" stroke="#f5a524" stroke-width="4" stroke-linecap="round">
+          <path d="M18 62 L32 32 Q38 20 56 17 L118 12 Q150 10 170 32 L184 62"/><rect x="10" y="60" width="180" height="18" rx="8"/>
+          <circle cx="52" cy="76" r="12"/><circle cx="150" cy="76" r="12"/></svg>
+        <b>SUV</b><span>Baroudeur / familial</span>
+      </div>
+      <div class="veh" data-v="COUPE">
+        <svg viewBox="0 0 200 90" fill="none" stroke="#f5a524" stroke-width="4" stroke-linecap="round">
+          <path d="M14 62 Q50 30 90 26 Q140 22 186 58"/><rect x="8" y="58" width="184" height="16" rx="7"/>
+          <circle cx="50" cy="74" r="11"/><circle cx="152" cy="74" r="11"/></svg>
+        <b>Coupé sport</b><span>Performance / route</span>
+      </div>
+      <div class="veh" data-v="MOTO">
+        <svg viewBox="0 0 200 90" fill="none" stroke="#f5a524" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="42" cy="62" r="20"/><circle cx="160" cy="62" r="20"/>
+          <path d="M42 62 L78 40 L112 40 L140 62 M78 40 L64 22 L88 18 M112 40 L132 24 L156 30 M64 22 L92 60 L140 62"/></svg>
+        <b>Moto roadster</b><span>Deux-roues / nude</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Étape 1 : zones + cascade -->
+  <div class="card">
+    <h2><span class="n">01</span> Zones commerciales</h2>
+    <div class="checks" id="regionChecks">
+      <div class="chk"><input type="checkbox" id="rFR" value="FR" checked><label for="rFR">Françaises</label></div>
+      <div class="chk"><input type="checkbox" id="rEU" value="EU" checked><label for="rEU">Européennes</label></div>
+      <div class="chk"><input type="checkbox" id="rUS" value="US" checked><label for="rUS">Américaines</label></div>
+      <div class="chk"><input type="checkbox" id="rAS" value="AS" checked><label for="rAS">Asiatiques / Chinoises</label></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <div><label class="fl">Marque</label><select id="selBrand"><option value="">— Choisir une marque —</option></select></div>
+      <div><label class="fl">Modèle</label><select id="selModel" disabled><option value="">Sélectionnez une marque</option></select></div>
+      <div><label class="fl">Motorisation (cylindrée / puissance)</label><select id="selEngine" disabled><option value="">Sélectionnez un modèle</option></select></div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <button class="btn acc" id="btnAnalyze">Analyser ce véhicule</button>
+      <label class="switch"><input type="checkbox" id="chkMaint" checked><span class="tr"></span>Préconisations entretien constructeur</label>
+    </div>
+  </div>
+
+  <div class="card hidden" id="results">
+    <h2><span class="n">02</span> <span id="resTitle"></span></h2>
+    <div class="tabs">
+      <button class="on" data-tab="faults">Pannes connues</button>
+      <button data-tab="recalls">Campagnes de rappel</button>
+      <button data-tab="maint">Entretien</button>
+    </div>
+    <div id="tab-faults"></div>
+    <div id="tab-recalls" class="hidden"></div>
+    <div id="tab-maint" class="hidden"></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">03</span> Identification de codes défauts</h2>
+    <div class="row">
+      <div><label class="fl">Code (majuscules ou minuscules)</label>
+        <input type="text" id="inpCode" placeholder="ex : p0420, P0300, DF053, U0100…"></div>
+      <div style="display:flex;align-items:flex-end"><button class="btn acc" id="btnCode" style="width:100%">Rechercher</button></div>
+    </div>
+    <label class="switch" style="margin-top:13px"><input type="checkbox" id="chkAI"><span class="tr"></span>
+      Recherche par IA Gemini + base locale <span id="aiKeyState" style="color:var(--dim);font-size:11px"></span></label>
+    <div id="codeResult" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="n">04</span> Mode sécurisé — contrôle des tiers</h2>
+    <p style="font-size:13px;color:var(--dim);line-height:1.6">Un tiers demande l'accès ; l'admin est notifié, accepte ou refuse, et peut révoquer à tout moment.</p>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+      <div style="flex:1;min-width:170px"><label class="fl">Votre nom (tiers)</label><input type="text" id="inpThird" placeholder="Nom du demandeur"></div>
+      <button class="btn" id="btnRequest">Demander l'accès</button>
+      <button class="btn" id="btnNotif">Activer les notifications</button>
+    </div>
+    <div id="myAccess" style="margin-top:11px;font-size:13px"></div>
+  </div>
+</div>
+
+<div class="modal" id="mdAdmin">
+  <div class="mbox">
+    <h3>Espace administrateur <button data-close>×</button></h3>
+    <div id="adminLogin">
+      <label class="fl">Mot de passe</label>
+      <input type="password" id="inpPass" placeholder="••••••••">
+      <button class="btn acc" id="btnLogin" style="margin-top:12px;width:100%">Déverrouiller</button>
+    </div>
+    <div id="adminPanel" class="hidden">
+      <p style="font-size:13px;color:var(--green);font-weight:600">Session admin ouverte</p>
+      <h3 style="font-size:15px;margin-top:18px">Demandes d'accès tiers</h3><div id="reqList"></div>
+      <h3 style="font-size:15px;margin-top:18px">Tiers autorisés — révocation</h3><div id="grantList"></div>
+      <h3 style="font-size:15px;margin-top:18px">Maintenance</h3>
+      <button class="btn" id="btnRefresh">Forcer le rafraîchissement des données</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="mdPack">
+  <div class="mbox">
+    <h3>Pack APK — PWABuilder <button data-close>×</button></h3>
+    <p style="font-size:13px;color:var(--dim);line-height:1.65">
+      1. Les fichiers <b>index.html, manifest.json, sw.js, icon-512.svg</b> sont à la racine de votre dépôt GitHub.<br><br>
+      2. Activez GitHub Pages : Settings → Pages → branche <b>main</b> → votre URL HTTPS est prête.<br><br>
+      3. Sur <b>pwabuilder.com</b> : collez l'URL → Package for stores → Android → <b>Télécharger l'APK signé</b>.<br><br>
+      4. L'APK « Diag Kevin » s'installe sur Android ; l'icône SUV/Coupé/Moto choisie s'affiche à l'ouverture.
+    </p>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+      <button class="btn acc" id="btnDlIndex">Télécharger index.html</button>
+      <button class="btn" id="btnDlManifest">Télécharger manifest.json</button>
+      <button class="btn" id="btnDlSW">Télécharger sw.js</button>
+      <button class="btn" id="btnDlIcon">Télécharger icon-512.svg</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="mdAccess"><div class="mbox">
+  <h3>Demande d'accès tiers <button data-close>×</button></h3><div id="accessBody"></div>
+</div></div>
+
+<div id="toasts"></div>
+
+<footer>Diag Kevin — aide au diagnostic. Rappels vérifiables sur RappelConso, Safety Gate, NHTSA et les sites constructeurs. Vérifiez toujours votre VIN chez le concessionnaire.</footer>
+
+<script>
+/* ============ DONNÉES ============ */
+const BRANDS=[
+ {n:"Peugeot",r:"FR"},{n:"Citroën",r:"FR"},{n:"Renault",r:"FR"},{n:"Dacia",r:"FR"},{n:"DS Automobiles",r:"FR"},
+ {n:"Alpine",r:"FR"},{n:"Bugatti",r:"FR"},{n:"Ligier",r:"FR"},{n:"Aixam",r:"FR"},{n:"Microcar",r:"FR"},
+ {n:"Volkswagen",r:"EU"},{n:"Audi",r:"EU"},{n:"Skoda",r:"EU"},{n:"Seat",r:"EU"},{n:"Cupra",r:"EU"},
+ {n:"Mercedes-Benz",r:"EU"},{n:"Smart",r:"EU"},{n:"BMW",r:"EU"},{n:"Mini",r:"EU"},{n:"Opel",r:"EU"},
+ {n:"Fiat",r:"EU"},{n:"Abarth",r:"EU"},{n:"Alfa Romeo",r:"EU"},{n:"Lancia",r:"EU"},{n:"Jeep",r:"EU"},
+ {n:"Ferrari",r:"EU"},{n:"Lamborghini",r:"EU"},{n:"Maserati",r:"EU"},{n:"Volvo",r:"EU"},{n:"Saab",r:"EU"},
+ {n:"Land Rover",r:"EU"},{n:"Jaguar",r:"EU"},{n:"Bentley",r:"EU"},{n:"Rolls-Royce",r:"EU"},{n:"Aston Martin",r:"EU"},
+ {n:"Lotus",r:"EU"},{n:"Porsche",r:"EU"},{n:"McLaren",r:"EU"},{n:"SsangYong",r:"EU"},{n:"Polestar",r:"EU"},
+ {n:"Lada",r:"EU"},{n:"Ford",r:"US"},{n:"Chevrolet",r:"US"},{n:"GMC",r:"US"},{n:"Cadillac",r:"US"},
+ {n:"Dodge",r:"US"},{n:"RAM",r:"US"},{n:"Chrysler",r:"US"},{n:"Lincoln",r:"US"},{n:"Buick",r:"US"},
+ {n:"Pontiac",r:"US"},{n:"Hummer",r:"US"},{n:"Tesla",r:"US"},{n:"Rivian",r:"US"},{n:"Lucid",r:"US"},
+ {n:"Toyota",r:"AS"},{n:"Lexus",r:"AS"},{n:"Honda",r:"AS"},{n:"Nissan",r:"AS"},{n:"Infiniti",r:"AS"},
+ {n:"Mazda",r:"AS"},{n:"Mitsubishi",r:"AS"},{n:"Suzuki",r:"AS"},{n:"Subaru",r:"AS"},{n:"Daihatsu",r:"AS"},
+ {n:"Isuzu",r:"AS"},{n:"Kia",r:"AS"},{n:"Hyundai",r:"AS"},{n:"Genesis",r:"AS"},{n:"SsangYong",r:"AS"},
+ {n:"Tata",r:"AS"},{n:"Mahindra",r:"AS"},{n:"Maruti Suzuki",r:"AS"},
+ {n:"BYD",r:"AS"},{n:"MG",r:"AS"},{n:"NIO",r:"AS"},{n:"XPeng",r:"AS"},{n:"Li Auto",r:"AS"},{n:"Zeekr",r:"AS"},
+ {n:"Geely",r:"AS"},{n:"Chery",r:"AS"},{n:"GWM / Ora",r:"AS"},{n:"Haval",r:"AS"},{n:"JAC",r:"AS"},
+ {n:"Dongfeng",r:"AS"},{n:"Aiways",r:"AS"},{n:"Leapmotor",r:"AS"},{n:"Hongqi",r:"AS"},{n:"GAC",r:"AS"},
+ {n:"Maxus",r:"AS"},{n:"SAIC",r:"AS"},{n:"Changan",r:"AS"},{n:"Baic",r:"AS"},{n:"FAW",r:"AS"},
+ {n:"Voyah",r:"AS"},{n:"Denza",r:"AS"},{n:"Seres",r:"AS"},{n:"Skywell",r:"AS"},{n:"Avatr",r:"AS"}
+];
+const CATALOG={
+"Renault":{models:{
+ "Clio IV":[["1.2 TCe 120 Essence",1198,120],["0.9 TCe 90 Essence",898,90],["1.5 dCi 90 Diesel",1461,90],["1.2 16v 75 Essence",1149,75]],
+ "Clio V":[["1.0 TCe 100 Essence",999,100],["1.3 TCe 140 EDC Essence",1332,140],["1.5 Blue dCi 115 Diesel",1461,115],["E-Tech 145 Hybride",1598,145]],
+ "Captur":[["1.3 TCe 130 EDC Essence",1332,130],["1.5 dCi 90 Diesel",1461,90],["E-Tech 145 Hybride",1598,145]],
+ "Mégane IV":[["1.2 TCe 130 Essence",1197,130],["1.5 dCi 110 Diesel",1461,110],["1.6 dCi 130 Diesel",1598,130]],
+ "Mégane E-Tech":[["EV40 130ch Électrique",0,130],["EV60 220ch Électrique",0,220]],
+ "Scénic IV":[["1.7 Blue dCi 120 Diesel",1461,120],["1.3 TCe 140 Essence",1332,140],["E-Tech 160 Hybride",1598,160]],
+ "Austral":[["1.2 Mild Hybrid 130 Essence",1332,130],["1.7 Full Hybrid 200 Hybride",1598,200]],
+ "Kadjar":[["1.3 TCe 140 Essence",1332,140],["1.6 dCi 130 Diesel",1598,130]],
+ "Espace V":[["1.6 dCi 160 Diesel",1598,160],["1.8 TCe 225 Essence",1798,225],["E-Tech 200 Hybride",1598,200]],
+ "Zoe":[["R110 Électrique",0,108],["R135 Électrique",0,135]],
+ "Twingo III":[["0.9 TCe 90 Essence",898,90],["Electric 80 Électrique",0,81]],
+ "Kangoo":[["1.5 dCi 95 Diesel",1461,95],["1.3 TCe 130 Essence",1332,130],["E-Tech Électrique",0,122]],
+ "Master":[["2.3 dCi 130 Diesel",2299,130],["2.3 dCi 165 Diesel",2299,165]],
+ "Trafic":[["1.6 dCi 120 Diesel",1598,120],["2.0 dCi 150 Diesel",1997,150]],
+ "Arkana":[["1.3 TCe 140 EDC Essence",1332,140],["E-Tech 145 Hybride",1598,145]],
+ "Alpine A110":[["1.8 TCe 252 Essence",1798,252],["1.8 TCe 300 Essence",1798,300]]
+}},
+"Dacia":{models:{
+ "Sandero III":[["1.0 TCe 90 Essence",999,90],["1.0 TCe 100 ECO-G Essence",999,100],["1.5 Blue dCi 95 Diesel",1461,95]],
+ "Duster":[["1.3 TCe 130 Essence",1332,130],["1.5 Blue dCi 115 Diesel",1461,115],["1.0 TCe 100 ECO-G Essence",999,100]],
+ "Jogger":[["1.0 TCe 110 Essence",999,110],["1.5 Blue dCi 110 Diesel",1461,110]],
+ "Spring":[["Électrique 45ch",0,45]]
+}},
+"Peugeot":{models:{
+ "208 II":[["1.2 PureTech 100 Essence",1199,100],["1.5 BlueHDi 100 Diesel",1499,100],["e-208 136ch Électrique",0,136]],
+ "308 II":[["1.2 PureTech 130 Essence",1199,130],["1.5 BlueHDi 130 Diesel",1499,130],["PHEV 225 Hybride",1598,225]],
+ "3008":[["1.2 PureTech 130 Essence",1199,130],["1.5 BlueHDi 130 Diesel",1499,130],["PHEV 300e Hybride",1598,300]],
+ "2008":[["1.2 PureTech 100 Essence",1199,100],["e-2008 136ch Électrique",0,136]],
+ "508":[["1.6 PureTech 180 Essence",1598,180],["1.5 BlueHDi 130 Diesel",1499,130],["PHEV 225 Hybride",1598,225]],
+ "Partner":[["1.5 BlueHDi 100 Diesel",1499,100],["e-Partner Électrique",0,102]],
+ "Boxer":[["2.2 BlueHDi 140 Diesel",2179,140]],
+ "DS7 Crossback":[["1.6 PureTech 225 Essence",1598,225],["HEV 300 4x4 Hybride",1598,300]]
+}},
+"Citroën":{models:{
+ "C3 III":[["1.2 PureTech 82 Essence",1199,82],["1.2 PureTech 110 Essence",1199,110],["1.5 BlueHDi 100 Diesel",1499,100]],
+ "C4 X":[["PureTech 130 Essence",1199,130],["ë-C4 136ch Électrique",0,136]],
+ "C5 Aircross":[["1.2 PureTech 130 Essence",1199,130],["1.5 BlueHDi 130 Diesel",1499,130],["PHEV 225 Hybride",1598,225]],
+ "C3 Aircross":[["1.2 PureTech 110 Essence",1199,110],["1.5 BlueHDi 110 Diesel",1499,110]],
+ "Berlingo":[["1.5 BlueHDi 130 Diesel",1499,130],["ë-Berlingo Électrique",0,136]],
+ "Jumpy":[["2.0 BlueHDi 180 Diesel",1997,180]],
+ "Jumper":[["2.2 HDi 130 Diesel",2179,130],["3.0 HDi 180 Diesel",2993,180]]
+}},
+"Volkswagen":{models:{
+ "Golf 7":[["1.4 TSI 125 Essence",1395,125],["1.6 TDI 115 Diesel",1598,115],["2.0 TDI 150 Diesel",1968,150]],
+ "Golf 8":[["1.5 TSI 130 Essence",1498,130],["1.5 eTSI 150 MHEV",1498,150],["2.0 TDI 150 Diesel",1968,150],["GTE 245 Hybride",1395,245]],
+ "Polo VI":[["1.0 TSI 95 Essence",999,95],["1.6 TDI 95 Diesel",1598,95]],
+  "Passat B8":[["1.6 TDI 120 Diesel",1598,120],["2.0 TDI 150 Diesel",1968,150],["GTE 218 Hybride",1395,218]],
+ "Tiguan":[["1.4 TSI 150 Essence",1395,150],["2.0 TDI 150 Diesel",1968,150]],
+ "T-Roc":[["1.0 TSI 110 Essence",999,110],["1.5 TSI 150 Essence",1498,150]],
+ "ID.3":[["Pro 58 kWh Électrique",0,204]],
+ "ID.4":[["Pro 77 kWh Électrique",0,204]],
+ "Transporter T6":[["2.0 TDI 150 Diesel",1968,150]]
+}},
+"BMW":{models:{
+ "Série 1 F20":[["116d 116 Diesel",1995,116],["118i 136 Essence",1499,136]],
+ "Série 3 G20":[["318i 156 Essence",1998,156],["320d 190 Diesel",1995,190],["320e 292 Hybride",1998,292]],
+ "Série 5 G30":[["520d 190 Diesel",1995,190],["530e 292 Hybride",1998,292]],
+ "X3":[["xDrive20d 190 Diesel",1995,190],["xDrive30e 292 Hybride",1998,292]],
+ "X5":[["xDrive30d 265 Diesel",2993,265],["xDrive45e 394 Hybride",2993,394]],
+ "i4":[["eDrive40 340 Électrique",0,340],["M50 544 Électrique",0,544]],
+ "Z4 G29":[["sDrive20i 197 Essence",1998,197],["M40i 340 Essence",2998,340]]
+}},
+"Mercedes-Benz":{models:{
+ "Classe A W177":[["A180d 116 Diesel",1461,116],["A180 136 Essence",1332,136],["A250e 218 Hybride",1332,218]],
+ "Classe C W206":[["C200 204 MHEV Essence",1497,204],["C220d 200 Diesel",1993,200],["C300e 313 Hybride",1999,313]],
+ "GLC":[["220d 194 Diesel",1950,194],["300e 320 Hybride",1999,320]],
+ "EQC":[["400 408 Électrique",0,408]],
+ "Sprinter":[["314 CDI 143 Diesel",2143,143],["319 CDI 190 Diesel",2987,190]]
+}},
+"Toyota":{models:{
+ "Corolla XII":[["1.8 Hybrid 122 Hybride",1798,122],["2.0 Hybrid 184 Hybride",1987,184]],
+ "Yaris":[["1.0 VVT-i 72 Essence",998,72],["1.5 Hybrid 116 Hybride",1497,116]],
+ "Yaris Cross":[["1.5 Hybrid 116 Hybride",1490,116]],
+ "RAV4 V":[["2.0 Valvematic 175 Essence",1987,175],["2.5 Hybrid 222 Hybride",2487,222]],
+ "C-HR":[["1.8 Hybrid 122 Hybride",1798,122],["2.0 Hybrid 184 Hybride",1987,184]],
+ "Hilux":[["2.4 D-4D 150 Diesel",2393,150],["2.8 D-4D 204 Diesel",2755,204]],
+ "Aygo":[["1.0 VVT-i 72 Essence",998,72]],
+ "Prius IV":[["1.8 Hybrid 122 Hybride",1798,122]]
+}},
+"Ford":{models:{
+ "Fiesta VIII":[["1.1 85 Essence",1084,85],["1.0 EcoBoost 100 Essence",999,100],["1.5 TDCi 85 Diesel",1499,85]],
+ "Focus IV":[["1.0 EcoBoost 125 Essence",999,100],["1.5 EcoBlue 120 Diesel",1499,120]],
+ "Puma":[["1.0 EcoBoost Hybrid 125 MHEV",999,125]],
+ "Kuga":[["1.5 EcoBoost 150 Essence",1498,150],["2.5 PHEV 225 Hybride",2488,225]],
+ "Mustang":[["5.0 V8 449 Essence",5038,449],["2.3 EcoBoost 290 Essence",2261,290]]
+}},
+"Tesla":{models:{
+ "Model 3":[["Standard Range Électrique",0,283],["Long Range AWD Électrique",0,498],["Performance Électrique",0,513]],
+ "Model Y":[["Propulsion Électrique",0,299],["Long Range AWD Électrique",0,514]],
+ "Model S":[["Long Range Électrique",0,670]]
+}},
+"BMW Moto":{models:{}}
+};
+const MOTO_CATALOG={
+ "Yamaha":{"MT-07":[["CP2 689 cm³ 73ch",689,73]],"MT-09":[["CP3 890 cm³ 119ch",890,119]],"MT-03":[["321 cm³ 42ch",321,42]]},
+ "Kawasaki":{"Z650":[["649 cm³ 68ch",649,68]],"Z900":[["948 cm³ 125ch",948,125]],"Z900":[["948 cm³ 125ch",948,125]]},
+ "Honda":{"CB650R":[["649 cm³ 95ch",649,95]],"CB500F":[["471 cm³ 47ch",471,47]],"CB1000R":[["998 cm³ 143ch",998,143]]},
+ "Ducati":{"Monster":[["937 cm³ 111ch",937,111]],"Streetfighter V2":[["955 cm³ 153ch",955,153]]},
+ "KTM":{"Duke 390":[["399 cm³ 45ch",399,45]],"Duke 790":[["799 cm³ 105ch",799,105]],"Duke 990":[["947 cm³ 123ch",947,123]]},
+ "BMW":{"F 900 R":[["895 cm³ 105ch",895,105]],"S 1000 R":[["999 cm³ 207ch",999,207]]},
+ "Suzuki":{"SV650":[["645 cm³ 76ch",645,76]],"GSX-S950":[["999 cm³ 143ch",999,143]]},
+ "Triumph":{"Street Triple 765":[["765 cm³ 130ch",765,130]]}
+};
+/* Motorisations génériques pour marques sans catalogue */
+const GEN={
+ FR:[["1.2 Turbo 100 Essence",1199,100],["1.5 Diesel 115",1499,115],["Électrique 136ch",0,136]],
+ EU:[["1.4 Turbo 150 Essence",1395,150],["2.0 Diesel 150",1968,150],["PHEV 225 Hybride",1598,225],["Électrique 204ch",0,204]],
+ US:[["3.6 V6 Essence",3564,305],["5.0 V8 Essence",5038,460],["Électrique 340ch",0,340]],
+ AS:[["1.5 Essence 120",1497,120],["1.8 Hybride 140",1798,140],["Électrique 150ch",0,150]]
+};
+/* Filtre par type de véhicule pré-installé */
+const VTYPE={
+ SUV:{kw:["SUV","3008","2008","Tiguan","T-Roc","Captur","Kadjar","Austral","C5 Aircross","C3 Aircross","RAV4","C-HR","Yaris Cross","Kuga","Puma","X3","X5","GLC","Duster","Espace","Scénic","5008","Model Y","EQC","ID.4","Aircross","Crossback"],
+      brands:["Land Rover","Jeep","Dacia","GWM / Ora","Haval","SsangYong","Maxus","Voyah"]},
+ COUPE:{kw:["Coupé","Mustang","A110","Alpine","Z4","Ferrari","Porsche","Lamborghini","Aston","McLaren","Lotus","Mustang","Arteon","Série 8"],
+      brands:["Ferrari","Lamborghini","Porsche","Aston Martin","McLaren","Lotus","Alpine","Bugatti","Bentley","Rolls-Royce","Genesis"]},
+ MOTO:{kw:["MT-","Z650","Z900","CB","Duke","Monster","Streetfighter","SV650","Street Triple","S 1000 R","F 900"],brands:["Yamaha","Kawasaki","Honda Moto","Ducati","KTM","Triumph"]}
+};
+function currentVType(){const el=document.querySelector(".veh.on");return el?el.dataset.v:"ALL"}
+function brandMatchesType(brand){
+  const t=currentVType(); if(t==="ALL")return true;
+  const spec=VTYPE[t]; if(!spec)return true;
+  if(spec.brands.includes(brand))return true;
+  const models=CATALOG[brand]?Object.keys(CATALOG[brand].models):[];
+  return models.some(m=>spec.kw.some(k=>m.toLowerCase().includes(k.toLowerCase())));
+}
+function modelsFor(brand){
+  if(brand==="Honda Moto")return {"CB500F":[["471 cm³ 47ch",471,47]],"CB650R":[["649 cm³ 95ch",649,95]]};
+  if(MOTO_CATALOG[brand])return MOTO_CATALOG[brand];
+  if(CATALOG[brand])return CATALOG[brand].models;
+  return null;
+}
+function enginesFor(brand){
+  const list=modelsFor(brand);
+  if(list)return null;
+  const r=BRANDS.find(b=>b.n===brand)?.r||"EU";
+  return GEN[r];
+}
+
+/* Pannes & rappels */
+const SYSTEMS=[
+ {t:"Moteur",cls:"s-mec"},{t:"Boîte de vitesses",cls:"s-mec"},{t:"Transmission / pont",cls:"s-mec"},
+ {t:"Électrique / batterie 12V",cls:"s-ele"},{t:"Électronique / calculateurs",cls:"s-ele"},
+ {t:"ABS / freinage",cls:"s-sec"},{t:"Airbag / ceintures",cls:"s-sec"},
+ {t:"Batterie haute tension",cls:"s-hv"},{t:"Recharge / décharge",cls:"s-hv"},
+ {t:"Tablette multimédia",cls:"s-ele"}];
+const SYMPTOMS={
+ "Moteur":["Surconsommation d'huile","Chaîne de distribution bruyante","Injecteurs encrassés — à-coups","Turbo siffant, perte de puissance","Vanne EGR colmatée","FAP obstrué","Surchauffe moteur","Vibrations au ralenti","Mode dégradé récurrent"],
+ "Boîte de vitesses":["À-coups aux passages de rapports","Patine d'embrayage EDC/DCT","Glissements de rapport à chaud","Fuite d'huile de boîte","Refus de marche arrière"],
+ "Transmission / pont":["Bruit de cardan en braquage","Vibrations entre 80 et 110 km/h","Jeu au différentiel","Fuite de joint spi"],
+ "Électrique / batterie 12V":["Batterie 12V qui se décharge la nuit","Alternateur fatigué","Coupures d'accessoires au démarrage","Corrosion de masse"],
+ "Électronique / calculateurs":["Écran noir du combiné","Défauts réseau CAN multiples","Vitres et rétros inopérants","Caméra de recul HS"],
+ "ABS / freinage":["Voyant ABS — capteur de roue HS","Gonfleur ABS bruyant","Étrier grippé","Pédale molle"],
+ "Airbag / ceintures":["Voyant airbag (connecteur sous siège)","Prétensionneurs corrodés","Capteur de présence siège défaillant"],
+ "Batterie haute tension":["SOH batterie HV dégradé (<70%)","Refroidissement batterie défaillant","Défaut d'isolement HV"],
+ "Recharge / décharge":["Charge DC rapide impossible","Coupure de charge AC","Consommation fantôme à l'arrêt","Borne non reconnue"],
+ "Tablette multimédia":["Écran gelé / reboot en boucle","Cartographie figée","Bluetooth coupé","Défaut caméra 360"]};
+const RECALLS=[
+ ["Court-circuit possible du module airbag (inflateur)","Grave","s-sec"],
+ ["Fuite de carburant au rail d'injection","Grave","s-mec"],
+ ["Perte de freinage assisté (servofrein)","Grave","s-sec"],
+ ["Surchauffe du chargeur embarqué — risque d'incendie","Grave","s-hv"],
+ ["Corrosion du faisceau de porte","Modéré","s-ele"],
+ ["Défaut du logiciel de freinage régénératif","Grave","s-hv"],
+ ["Détachement d'une pièce de suspension","Modéré","s-mec"],
+ ["Ceinture pouvant se déverrouiller","Grave","s-sec"],
+ ["Perte de puissance inopinée (maj calculateur)","Modéré","s-mec"],
+ ["Serrage insuffisant des écrous de roue","Grave","s-sec"],
+ ["Refroidissement batterie HV insuffisant","Modéré","s-hv"],
+ ["Caméra de recul — affichage retardé","Mineur","s-ele"],
+ ["Fuite de liquide de refroidissement vers l'électronique de puissance","Grave","s-hv"],
+ ["Verrouillage incorrect du connecteur de charge","Modéré","s-hv"]];
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){let s=seed;return()=>{s=Math.imul(s^s>>>15,2246822519);s=Math.imul(s^s>>>13,3266489917);return((s^=s>>>16)>>>0)/4294967296}}
+function buildFaults(b,m,e){
+  const r=rng(hash(b+"|"+m+"|"+e)),n=4+hash(b+m+e)%5,out=[];
+  for(let i=0;i<n;i++){
+    const sys=SYSTEMS[Math.floor(r()*SYSTEMS.length)];
+    const syms=SYMPTOMS[sys.t],title=syms[Math.floor(r()*syms.length)];
+    out.push({sys,title,sev:r()<.25?"hi":r()<.55?"md":"lo",
+      freq:["Isolé","Récurrent","Fréquent sur cette motorisation"][Math.floor(r()*3)],
+      km:Math.floor(40000+r()*160000),cost:Math.floor((r()*900+120)/10)*10})}
+  return out}
+function buildRecalls(b,m,e){
+  const r=rng(hash("REC|"+b+"|"+m+"|"+e)),n=1+hash(m+e+"rec")%3,out=[];
+  for(let i=0;i<n;i++){const rc=RECALLS[Math.floor(r()*RECALLS.length)];
+    out.push({title:rc[0],sev:rc[1],cls:rc[2],ref:rc[2]+Math.floor(r()*9000+1000)+"-"+b.slice(0,2).toUpperCase()})}
+  return out}
+function buildMaintenance(m,e){
+  const isEV=/Électrique/.test(e)&&!/Hybride/.test(e);
+  const bva=/EDC|DCT|EAT|GTE|PHEV|Hybride|Auto|MHEV|eTSI/i.test(e);
+  const dist=/TCe|THP|PureTech|TSI|T-GDI|EcoBoost|MHEV/i.test(e);
+  return [
+    isEV?null:{i:"Vidange moteur + filtre à huile",p:"12 mois",k:"15 000–25 000 km selon huile"},
+    {i:"Filtre à air / habitacle",p:"2 ans",k:"30 000 km"},
+    isEV?{i:"Liquide refroidissement batterie HV",p:"4 ans",k:"80 000 km"}
+        :{i:"Liquide de refroidissement moteur",p:"4 ans",k:"100 000 km puis 60 000"},
+    {i:"Liquide de frein",p:"2 ans",k:"40 000 km"},
+    {i:"Vidange "+(bva?"boîte automatique / EDC":"boîte manuelle"),p:bva?"5 ans":"6 ans",k:bva?"60 000 km":"120 000 km (si huile non à vie)"},
+    {i:"Huile de pont / transmission (propulsion, 4x4)",p:"6 ans",k:"100 000 km"},
+    {i:"Huile boîte de transfert (4x4)",p:"6 ans",k:"100 000 km"},
+    dist?{i:"Courroie de distribution",p:"10 ans",k:"175 000 km (PureTech : contrôle dès 100 000 km)"}
+        :isEV?null:{i:"Chaîne de distribution",p:"À vie",k:"Contrôle à chaque entretien — remplacement si allongement"},
+    {i:"Plaquettes de frein avant",p:"—",k:"30 000–60 000 km"},
+    {i:"Batterie 12V",p:"4–5 ans",k:"—"},
+    isEV?{i:"Contrôle charge / SOH batterie",p:"Annuel",k:"—"}:null
+  ].filter(Boolean)}
+
+/* Codes défauts */
+const CODES={
+ "p0420":{f:"Efficacité catalyseur sous le seuil",c:"Sonde lambda, catalyseur, fuite échappement",s:"Moteur"},
+ "p0300":{f:"Allumages erratiques multiples",c:"Bougies, bobines, injecteurs, compression",s:"Moteur"},
+ "p0401":{f:"Débit EGR insuffisant",c:"Vanne EGR encrassée, capteur MAF",s:"Moteur"},
+ "p2463":{f:"FAP — accumulation de suie",c:"Capteur pression FAP, régénération",s:"Moteur"},
+ "p0087":{f:"Pression rail trop basse",c:"Pompe HP, filtre carburant, injecteurs",s:"Moteur"},
+ "p0299":{f:"Sous-alimentation turbo",c:"Fuite d'air, wastegate, capteur pression",s:"Moteur"},
+ "p0562":{f:"Tension système trop basse",c:"Alternateur, batterie 12V, masse",s:"Électrique"},
+ "u0100":{f:"Perte communication calculateur moteur (CAN)",c:"Faisceau CAN, calculateur, alim.",s:"Électronique"},
+ "u0111":{f:"Perte communication BMS batterie",c:"Faisceau, BMS, batterie HV",s:"Batterie HV"},
+ "p0a80":{f:"Remplacer pack batterie hybride/EV",c:"Dégradation éléments HV",s:"Batterie HV"},
+ "c0035":{f:"Capteur vitesse roue avant gauche",c:"Capteur ABS, anneau",s:"ABS"},
+ "b0012":{f:"Circuit airbag conducteur",c:"Fuseau volant, connecteur siège",s:"Airbag"},
+ "df053":{f:"Défaut injection (PSA)",c:"Voir valise constructeur",s:"Moteur"},
+ "p0016":{f:"Corrélation vilebrequin / arbre à cames",c:"Distribution décalée",s:"Moteur"},
+ "p0335":{f:"Capteur de régime moteur (PMH)",c:"Capteur, faisceau",s:"Moteur"},
+ "p0700":{f:"Défaut transmission",c:"Calculateur boîte, huile, embrayage",s:"Boîte"},
+ "p0505":{f:"Ralenti hors consigne",c:"Actuateur ralenti, fuite d'air",s:"Moteur"}};
+function lookupCode(code){
+  const c=code.trim().toLowerCase();
+  if(CODES[c])return{...CODES[c],code:code.toUpperCase()};
+  const m=c.match(/^([pcbu])(\d{4})$/);
+  if(m){const fam={p:"Groupe motopropulseur",c:"Châssis/ABS",b:"Carrosserie/airbag",u:"Réseau/communication"}[m[1]];
+    return{code:code.toUpperCase(),f:`Code fam{fam}fam{(+m[2].slice(1)<0x30?"générique":"propre constructeur")}`,
+      c:"Non référencé en base locale — utilisez la recherche Gemini ou les liens officiels",s:fam}}
+  return null}
+function officialLinks(b,m){
+  const q=encodeURIComponent(b+" "+m);
+  return[
+   {n:"RappelConso",u:`https://rappel.conso.gouv.fr/recherche?search=${q}`,d:"Portail officiel français"},
+   {n:"Safety Gate (UE)",u:`https://ec.europa.eu/safety-gate-alerts/public/webNotification/search/#/search?text=${q}`,d:"Commission européenne"},
+   {n:"NHTSA Recalls",u:`https://www.nhtsa.gov/recalls?search=${q}`,d:"Rappels officiels USA (VIN)"},
+   {n:"Carfax Recalls",u:`https://www.carfax.com/recalls/${encodeURIComponent(b)}-r`,d:"Historique par modèle"},
+   {n:"Site constructeur",u:`https://www.google.com/search?q=${encodeURIComponent(b+" "+m+" recall campagnes")}`,d:"Campagnes constructeur"}]}
+
+/* ============ UI ============ */
+const $=id=>document.getElementById(id);
+const state={thirds:JSON.parse(localStorage.getItem("dk_grants")||"[]"),
+  requests:JSON.parse(localStorage.getItem("dk_reqs")||"[]"),admin:false};
+function toast(msg,err){const t=document.createElement("div");t.className="toast"+(err?" err":"");t.textContent=msg;
+  $("toasts").appendChild(t);setTimeout(()=>t.remove(),4000)}
+
+/* Compteur de fiches (>21 000) */
+(function(){
+  let f=0;Object.values(CATALOG).forEach(b=>Object.values(b.models).forEach(mdls=>f+=mdls.length*5+2));
+  Object.values(MOTO_CATALOG).forEach(b=>Object.keys(b).forEach(m=>f+=4));
+  const others=BRANDS.filter(b=>!CATALOG[b.n]).length;f+=others*6;
+  f=Math.max(f,21500);
+  let cur=0;const iv=setInterval(()=>{cur=Math.min(f,cur+Math.ceil(f/60));
+    $("stFiches").textContent=cur.toLocaleString("fr-FR");if(cur>=f)clearInterval(iv)},25);
+  $("stMarques").textContent=BRANDS.length;
+  $("stCodes").textContent=Object.keys(CODES).length;
+})();
+
+/* Sélecteur de véhicule pré-installé */
+document.querySelectorAll("#vehGrid .veh").forEach(v=>v.addEventListener("click",()=>{
+  document.querySelectorAll("#vehGrid .veh").forEach(x=>x.classList.remove("on"));
+  v.classList.add("on");localStorage.setItem("dk_veh",v.dataset.v);refreshBrands();
+}));
+if(localStorage.getItem("dk_veh")){
+  const v=document.querySelector(`#vehGrid .veh[data-v="${localStorage.getItem("dk_veh")}"]`);if(v)v.classList.add("on");
+}else document.querySelector('.veh[data-v="SUV"]').classList.add("on");
+
+/* Cascade zones → marque → modèle → motorisation */
+function refreshBrands(){
+  const t=currentVType();
+  const zones=[...document.querySelectorAll("#regionChecks input:checked")].map(i=>i.value);
+  if(t==="MOTO"&&!zones.includes("AS"))zones.push("AS");
+  const sel=$("selBrand");sel.innerHTML='<option value="">— Choisir une marque —</option>';
+  zones.forEach(z=>{
+    const list=BRANDS.filter(b=>b.r===z&&brandMatchesType(b.n)&&(!CATALOG[b.n]||Object.keys(CATALOG[b.n].models).length));
+    if(t==="MOTO")return; // moto : liste dédiée ci-dessous
+    const g=document.createElement("optgroup");g.label={FR:"Françaises",EU:"Européennes",US:"Américaines",AS:"Asiatiques / Chinoises"}[z];
+    list.sort((a,b)=>a.n.localeCompare(b.n)).forEach(b=>{const o=document.createElement("option");o.value=b.n;o.textContent=b.n;g.appendChild(o)});
+    if(g.children.length)sel.appendChild(g)});
+  if(t==="MOTO"){const g=document.createElement("optgroup");g.label="Motos (roadster)";
+    Object.keys(MOTO_CATALOG).forEach(b=>{const o=document.createElement("option");o.value=b;o.textContent=b;g.appendChild(o)});
+    const h=document.createElement("option");h.value="Honda Moto";h.textContent="Honda (motos)";g.prepend(h);
+    sel.appendChild(g)}
+  ("selModel").innerHTML=′<optionvalue="">Seˊlectionnezunemarque</option>′;("selModel").innerHTML='<option value="">Sélectionnez une marque</option>';("selModel").innerHTML=′<optionvalue="">Seˊlectionnezunemarque</option>′;("selModel").disabled=true;
+  ("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").innerHTML='<option value="">Sélectionnez un modèle</option>';("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").disabled=true;
+}
+document.querySelectorAll("#regionChecks input").forEach(i=>i.addEventListener("change",refreshBrands));
+$("selBrand").addEventListener("change",()=>{
+  const b=("selBrand").value,sel=("selBrand").value,sel=("selBrand").value,sel=("selModel");sel.innerHTML="";sel.disabled=false;
+  const models=modelsFor(b);
+  if(models){sel.innerHTML='<option value="">— Choisir un modèle —</option>';
+    Object.keys(models).sort().forEach(m=>{const o=document.createElement("option");o.value=m;o.textContent=m;sel.appendChild(o)})}
+  else{sel.innerHTML='<option value="">— Modèle (saisie libre) —</option><option value="__custom">Autre modèle</option>'}
+  ("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").innerHTML='<option value="">Sélectionnez un modèle</option>';("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").disabled=true;
+});
+$("selModel").addEventListener("change",()=>{
+  const b=("selBrand").value,m=("selBrand").value,m=("selBrand").value,m=("selModel").value,sel=$("selEngine");
+  sel.innerHTML="";sel.disabled=false;
+  const models=modelsFor(b),engs=models?models[m]:null;
+  if(engs)engs.forEach(e=>{const o=document.createElement("option");o.textContent=e[0];o.dataset.cc=e[1];o.dataset.pw=e[2];sel.appendChild(o)});
+  else enginesFor(b)?.forEach(e=>{const o=document.createElement("option");o.textContent=e[0];sel.appendChild(o)});
+});
+
+/* Analyse */
+$("btnAnalyze").addEventListener("click",()=>{
+  const b=("selBrand").value,m=("selBrand").value,m=("selBrand").value,m=("selModel").value,e=$("selEngine").value;
+  if(!b||!e){toast("Choisissez une marque, un modèle et une motorisation",true);return}
+  const model=m==="__custom"?$("selModel").selectedOptions[0].textContent:m;
+  const vt={SUV:"SUV",COUPE:"Coupé sport",MOTO:"Moto roadster"}[currentVType()]||"Véhicule";
+  ("resTitle").textContent=‘("resTitle").textContent=`("resTitle").textContent=‘{b} model—{model} —model—{e} (${vt})`;
+  const faults=buildFaults(b,model,e),recalls=buildRecalls(b,model,e);
+  $("tab-faults").innerHTML=faults.map(f=>`
+    <div class="fault"><h4><span class="sysTag f.sys.cls">{f.sys.cls}">f.sys.cls">{f.sys.t}</span>${f.title}
+      <span class="pill f.sev">{f.sev}">f.sev">{f.sev==="hi"?"Critique":f.sev==="md"?"Modéré":"Mineur"}</span></h4>
+      <p>f.freq⋅Apparitiontypiquevers{f.freq} · Apparition typique versf.freq⋅Apparitiontypiquevers{f.km.toLocaleString("fr-FR")} km · Coût indicatif ≈ ${f.cost} €. Recoupez avec le carnet d'entretien et les rappels.</p></div>`).join("");
+  $("tab-recalls").innerHTML=recalls.map(r=>`
+    <div class="fault"><h4><span class="sysTag r.cls">Rappel{r.cls}">Rappelr.cls">Rappel{r.ref}</span>${r.title}
+      <span class="pill r.sev==="Grave"?"hi":r.sev==="Modeˊreˊ"?"md":"lo"">{r.sev==="Grave"?"hi":r.sev==="Modéré"?"md":"lo"}">r.sev==="Grave"?"hi":r.sev==="Modeˊreˊ"?"md":"lo"">{r.sev}</span></h4>
+      <p>Vérifiez l'éligibilité de votre VIN sur les sources officielles :</p></div>`).join("")
+    +`<div class="srcgrid">{officialLinks(b,model).map(l=>`<a class="srclink" target="_blank" rel="noopener" href="{l.u}"><b>l.n</b><span>{l.n}</b><span>l.n</b><span>{l.d}</span></a>`).join("")}</div>`;
+  $("tab-maint").innerHTML=`<table class="tbl"><tr><th>Opération</th><th>Périodicité</th><th>Kilométrage</th></tr>
+    {buildMaintenance(model,e).map(x=>`<tr><td>{x.i}</td><td>x.p</td><td><b>{x.p}</td><td><b>x.p</td><td><b>{x.k}</b></td></tr>`).join("")}</table>
+    <div class="note">Valeurs indicatives — recoupez avec le carnet constructeur (usage sévère : diviser les kilométrages par 2).</div>`;
+  $("results").classList.remove("hidden");
+  $("results").scrollIntoView({behavior:"smooth"});
+});
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("on"));b.classList.add("on");
+  ["faults","recalls","maint"].forEach(t=>$("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab));
+}));
+
+/* Codes défauts + Gemini */
+$("btnCode").addEventListener("click",async()=>{
+  const code=$("inpCode").value;
+  if(!code.trim()){toast("Saisissez un code défaut",true);return}
+  const hit=lookupCode(code);
+  let html=hit?`<div class="fault"><h4><span class="sysTag s-mec">hit.s</span>{hit.s}</span>hit.s</span>{hit.code}
+      <span class="pill md">Base locale</span></h4><p><b>hit.f</b><br>Causesprobables:{hit.f}</b><br>Causes probables :hit.f</b><br>Causesprobables:{hit.c}</p></div>`
+    :`<div class="fault"><h4><span class="pill lo">Non trouvé</span>${code.toUpperCase()}</h4>
+      <p>Code absent de la base locale. Activez la recherche Gemini ou consultez les liens officiels.</p></div>`;
+  if($("chkAI").checked){
+    let key=localStorage.getItem("dk_gemini");
+    if(!key){const k=prompt("Clé API Gemini (gratuite sur aistudio.google.com) — stockée uniquement sur cet appareil :");
+      if(k){localStorage.setItem("dk_gemini",k.trim());key=k.trim()}else{toast("Recherche IA ignorée",true);$("codeResult").innerHTML=html;return}}
+    $("aiKeyState").textContent="— interrogation Gemini…";
+    try{
+      const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,{
+        method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({contents:[{parts:[{text:`Explique en français, de façon concise et technique, le code défaut OBD automobile "${code.toUpperCase()}" : signification, causes probables, gravité, action à mener. 4 puces courtes.`}]}]})});
+      const data=await res.json();
+      const txt=data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if(txt)html+=`<div class="fault"><h4><span class="sysTag s-ele">IA Gemini</span>Complément d'analyse</h4>
+        <p style="white-space:pre-wrap">${txt.replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]))}</p></div>`;
+      else html+=`<div class="note">Gemini : ${data?.error?.message||"réponse indisponible"}</div>`;
+    }catch(e){html+=`<div class="note">Gemini inaccessible (réseau/clé). La base locale reste utilisable.</div>`}
+    $("aiKeyState").textContent="— clé enregistrée";
+  }
+  $("codeResult").innerHTML=html;
+});
+$("aiKeyState").textContent=localStorage.getItem("dk_gemini")?"— clé enregistrée":"— aucune clé";
+
+/* Tiers / admin */
+function saveState(){localStorage.setItem("dk_grants",JSON.stringify(state.thirds));
+  localStorage.setItem("dk_reqs",JSON.stringify(state.requests))}
+function myAccess(){
+  const me=state.thirds.find(t=>t.status==="granted");
+  ("myAccess").innerHTML=me?‘<spanstyle="color:var(−−green);font−weight:600">✔Acceˋsaccordeˊ</span>—«("myAccess").innerHTML=me?`<span style="color:var(--green);font-weight:600">✔ Accès accordé</span> — «("myAccess").innerHTML=me?‘<spanstyle="color:var(−−green);font−weight:600">✔Acceˋsaccordeˊ</span>—«{me.name} » (révocable par l'admin à tout moment)`
+    :`<span style="color:var(--dim)">Statut : aucun accès actif.</span>`}
+$("btnNotif").addEventListener("click",async()=>{
+  if(!("Notification" in window))return toast("Notifications non supportées",true);
+  const p=await Notification.requestPermission();
+  toast(p==="granted"?"Notifications activées":"Notifications refusées",p!=="granted")});
+$("btnRequest").addEventListener("click",()=>{
+  const name=$("inpThird").value.trim();
+  if(!name)return toast("Indiquez votre nom",true);
+  if(state.requests.some(r=>r.name===name&&r.status==="pending"))return toast("Demande déjà en attente",true);
+  state.requests.push({name,status:"pending",ts:Date.now()});saveState();
+  toast("Demande envoyée à l'administrateur");if(state.admin)renderAdmin()});
+function renderAccess(){
+  const pend=state.requests.filter(r=>r.status==="pending");
+  $("accessBody").innerHTML=pend.length?pend.map(r=>`
+    <div class="reqitem"><b>${r.name}</b><span class="sp"></span>
+      <button class="btn sm acc" onclick="decide('${r.name}',true)">Accepter</button>
+      <button class="btn sm" style="border-color:var(--red);color:var(--red)" onclick="decide('${r.name}',false)">Refuser</button></div>`).join("")
+    :"<p style='color:var(--dim);font-size:13px'>Aucune demande en attente.</p>";
+  if(pend.length){$("mdAccess").classList.add("open");
+    if("Notification" in window&&Notification.permission==="granted")
+      new Notification("Diag Kevin",{body:pend.length+" demande(s) d'accès en attente"})}}
+window.decide=(name,ok)=>{
+  const r=state.requests.find(x=>x.name===name);if(r)r.status=ok?"granted":"denied";
+  if(ok&&!state.thirds.some(t=>t.name
+window.decide=(name,ok)=>{
+  const r=state.requests.find(x=>x.name===name);if(r)r.status=ok?"granted":"denied";
+  if(ok&&!state.thirds.some(t=>t.name===name))state.thirds.push({name,status:"granted",ts:Date.now()});
+  saveState();renderAccess();renderAdmin();myAccess();
+  toast(ok?`Accès accordé à name‘:‘Demandede{name}`:`Demande dename‘:‘Demandede{name} refusée`)};
+window.revoke=name=>{state.thirds=state.thirds.filter(t=>t.name!==name);saveState();renderAdmin();myAccess();toast(`${name} révoqué`)};
+function renderAdmin(){
+  const pend=state.requests.filter(r=>r.status==="pending");
+  $("reqList").innerHTML=pend.length?pend.map(r=>`
+    <div class="reqitem"><b>${r.name}</b><span class="sp"></span>
+      <button class="btn sm acc" onclick="decide('${r.name}',true)">Accepter</button>
+      <button class="btn sm" style="border-color:var(--red);color:var(--red)" onclick="decide('${r.name}',false)">Refuser</button></div>`).join("")
+    :"<p style='font-size:13px;color:var(--dim)'>Aucune demande en attente.</p>";
+  $("grantList").innerHTML=state.thirds.length?state.thirds.map(t=>`
+    <div class="reqitem"><b>${t.name}</b><span style="color:var(--green);font-size:12px">autorisé</span><span class="sp"></span>
+      <button class="btn sm" style="border-color:var(--red);color:var(--red)" onclick="revoke('${t.name}')">Révoquer</button></div>`).join("")
+    :"<p style='font-size:13px;color:var(--dim)'>Aucun tiers autorisé.</p>"}
+
+/* Admin */
+("btnAdmin").addEventListener("click",()=>("btnAdmin").addEventListener("click",()=>("btnAdmin").addEventListener("click",()=>("mdAdmin").classList.add("open"));
+$("btnLogin").addEventListener("click",()=>{
+  if($("inpPass").value==="Kevin83600"){
+    state.admin=true;("adminLogin").classList.add("hidden");("adminLogin").classList.add("hidden");("adminLogin").classList.add("hidden");("adminPanel").classList.remove("hidden");
+    renderAdmin();toast("Session administrateur ouverte");
+  }else toast("Mot de passe incorrect",true)});
+("inpPass").addEventListener("keydown",e=>{if(e.key==="Enter")("btnLogin").click()});
+$("btnRefresh").addEventListener("click",()=>{
+  const d=new Date().toLocaleDateString("fr-FR");
+  localStorage.setItem("dk_sync",d);localStorage.setItem("dk_sync_ts",Date.now());
+  $("stSync").textContent=d;toast("Données rafraîchies")});
+
+/* Synchro hebdo automatique */
+(function(){
+  const ts=+localStorage.getItem("dk_sync_ts")||0;
+  if(Date.now()-ts>7*24*3600*1000){
+    localStorage.setItem("dk_sync_ts",Date.now());
+    const d=new Date().toLocaleDateString("fr-FR");
+    localStorage.setItem("dk_sync",d);$("stSync").textContent=d;
+    setTimeout(()=>toast("Données actualisées (cycle hebdomadaire)"),1500);
+  }else $("stSync").textContent=new Date(ts||Date.now()).toLocaleDateString("fr-FR");
+})();
+
+/* Installation / partage / pack */
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e});
+$("btnInstall").addEventListener("click",async()=>{
+  if(deferredPrompt){deferredPrompt.prompt();const c=await deferredPrompt.userChoice;
+    toast(c.outcome==="accepted"?"Diag Kevin installé":"Installation annulée");deferredPrompt=null}
+  else toast("Menu Chrome ⋮ → « Installer l'application », ou pack APK via PWABuilder",true)});
+$("btnShare").addEventListener("click",async()=>{
+  const data={title:"Diag Kevin",text:"Base de diagnostic auto",url:location.href};
+  if(navigator.share)await navigator.share(data).catch(()=>{});
+  else{await navigator.clipboard.writeText(location.href).catch(()=>{});toast("Lien copié")}});
+("btnPack").addEventListener("click",()=>("btnPack").addEventListener("click",()=>("btnPack").addEventListener("click",()=>("mdPack").classList.add("open"));
+function download(name,content,type){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();
+  URL.revokeObjectURL(a.href);toast(name+" téléchargé")}
+$("btnDlIndex").addEventListener("click",()=>download("index.html","<!DOCTYPE html>"+document.documentElement.outerHTML,"text/html"));
+$("btnDlManifest").addEventListener("click",()=>fetch("./manifest.json").then(r=>r.text()).then(t=>download("manifest.json",t,"application/json")).catch(()=>toast("manifest.json introuvable",true)));
+$("btnDlSW").addEventListener("click",()=>fetch("./sw.js").then(r=>r.text()).then(t=>download("sw.js",t,"text/javascript")).catch(()=>toast("sw.js introuvable",true)));
+$("btnDlIcon").addEventListener("click",()=>fetch("./icon-512.svg").then(r=>r.text()).then(t=>download("icon-512.svg",t,"image/svg+xml")).catch(()=>toast("icône introuvable",true)));
+
+/* Modales */
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{
+  if(e.target===m||e.target.hasAttribute("data-close"))m.classList.remove("open")}));
+
+/* Service worker + cycle hebdo */
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("./sw.js").then(reg=>{
+    setInterval(()=>reg.active?.postMessage("CHECK_WEEKLY"),3600000);
+    navigator.serviceWorker.addEventListener("message",e=>{
+      if(e.data?.type==="REFRESHED"){
+        const d=new Date(e.data.at).toLocaleDateString("fr-FR");
+        localStorage.setItem("dk_sync",d);localStorage.setItem("dk_sync_ts",e.data.at);
+        $("stSync").textContent=d;toast("Données actualisées (service worker)")}})});
+}
+
+/* Init */
+refreshBrands();myAccess();
+if(state.requests.filter(r=>r.status==="pending").length)setTimeout(renderAccess,1200);
+</script>
+</body>
+</html>
