@@ -1,5 +1,5 @@
 /* Diag Kevin — Service Worker : cache offline + rafraîchissement hebdomadaire */
-const CACHE_NAME="diag-kevin-v1";
+const CACHE_NAME="diag-kevin-v2";
 const WEEK_MS=7*24*60*60*1000;
 const CORE_ASSETS=["./","./index.html","./manifest.json","./icon-512.svg"];
 
