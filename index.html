@@ -110,6 +110,9 @@ label.fl{display:block;font-size:11px;color:var(--dim);text-transform:uppercase;
 .note{font-size:12px;color:var(--dim);line-height:1.55;margin-top:12px;border-left:2px solid var(--line);padding-left:12px}
 footer{border-top:1px solid var(--line);padding:24px 18px;text-align:center;color:var(--dim);font-size:11.5px}
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
@@ -530,7 +533,46 @@ function officialLinks(b,m){
    {n:"Site constructeur",u:`https://www.google.com/search?q=${encodeURIComponent(b+" "+m+" recall campagnes")}`,d:"Campagnes constructeur"}]}
 
 /* ============ UI ============ */
-const $=id=>document.getElementById(id);
+const $=id=>document.getElementById(id);/* ============ FIREBASE : accès tiers partagé en temps réel ============ */
+firebase.initializeApp({
+  apiKey: "AIzaSyBFxUJrubgRtct17yTi4gCtBCZHn3c0Lkk",
+  authDomain: "kevin-diag.firebaseapp.com",
+  projectId: "kevin-diag",
+  storageBucket: "kevin-diag.firebasestorage.app",
+  messagingSenderId: "1081954267141",
+  appId: "1:1081954267141:web:d4ffea920c2ea5c480ec6c"
+});
+const db = firebase.firestore();
+const accessDoc = db.doc("access/state");
+
+/* Charge l'état des accès depuis Firestore */
+async function loadAccess(){
+  try{
+    const snap = await accessDoc.get();
+    if(snap.exists){
+      state.thirds = snap.data().thirds||[];
+      state.requests = snap.data().requests||[];
+      myAccess();
+      if(state.admin) renderAdmin();
+    }
+  }catch(e){ /* hors ligne : repli localStorage */ }
+}
+/* Sauvegarde centralisée (remplace l'ancienne fonction saveState) */
+async function saveState(){
+  localStorage.setItem("dk_grants",JSON.stringify(state.thirds));
+  localStorage.setItem("dk_reqs",JSON.stringify(state.requests));
+  try{ await accessDoc.set({thirds:state.thirds,requests:state.requests}) }catch(e){}
+}
+/* Temps réel : acceptation/refus visible instantanément partout */
+accessDoc.onSnapshot(snap=>{
+  if(!snap.exists)return;
+  state.thirds=snap.data().thirds||[];
+  state.requests=snap.data().requests||[];
+  myAccess();
+  if(state.admin)renderAdmin();
+});
+loadAccess();
+  
 const state={thirds:JSON.parse(localStorage.getItem("dk_grants")||"[]"),
   requests:JSON.parse(localStorage.getItem("dk_reqs")||"[]"),admin:false};
 function toast(msg,err){const t=document.createElement("div");t.className="toast"+(err?" err":"");t.textContent=msg;
@@ -652,8 +694,7 @@ $("btnCode").addEventListener("click",async()=>{
 $("aiKeyState").textContent=localStorage.getItem("dk_gemini")?"— clé enregistrée":"— aucune clé";
 
 /* Tiers / admin */
-function saveState(){localStorage.setItem("dk_grants",JSON.stringify(state.thirds));
-  localStorage.setItem("dk_reqs",JSON.stringify(state.requests))}
+
 function myAccess(){
   const me=state.thirds.find(t=>t.status==="granted");
   ("myAccess").innerHTML=me?‘<spanstyle="color:var(−−green);font−weight:600">✔Acceˋsaccordeˊ</span>—«("myAccess").innerHTML=me?`<span style="color:var(--green);font-weight:600">✔ Accès accordé</span> — «("myAccess").innerHTML=me?‘<spanstyle="color:var(−−green);font−weight:600">✔Acceˋsaccordeˊ</span>—«{me.name} » (révocable par l'admin à tout moment)`
