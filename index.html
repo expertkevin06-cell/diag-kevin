@@ -11,6 +11,9 @@
 <link rel="apple-touch-icon" href="./icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <style>
 :root{
   --bg:#140808; --panel:#1d1010; --panel2:#261515; --line:#3d2222;
@@ -18,11 +21,9 @@
   --fh:"Barlow Condensed",sans-serif; --fb:"Archivo",sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--txt);font-family:var(--fb);min-height:100vh;
-  background-repeat:no-repeat;background-position:center 70px;
-  background-size:min(1050px,96vw) auto;background-attachment:fixed;transition:background-image .4s}
+body{background:var(--bg);color:var(--txt);font-family:var(--fb);min-height:100vh}
 header{position:sticky;top:0;z-index:50;background:rgba(20,8,8,.93);backdrop-filter:blur(8px);
-  border-bottom:1px var(--line);display:flex;align-items:center;gap:10px;padding:12px 18px;flex-wrap:wrap}
+  border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:12px 18px;flex-wrap:wrap}
 .logo b{font-family:var(--fh);font-size:25px;letter-spacing:2px;color:var(--amber)}
 .logo span{font-size:11px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-left:8px}
 header .sp{flex:1}
@@ -31,7 +32,6 @@ header .sp{flex:1}
 .btn:hover{border-color:var(--amber)}
 .btn.acc{background:var(--amber);color:#1a0e05;border-color:var(--amber)}
 .btn.sm{padding:6px 10px;font-size:12px}
-.badge{background:var(--red);color:#fff;font-size:10px;border-radius:9px;padding:1px 6px;margin-left:4px;display:none}
 .wrap{max-width:980px;margin:0 auto;padding:24px 18px 90px}
 .hero{padding:36px 0 24px}
 .hero h1{font-family:var(--fh);font-size:clamp(36px,7vw,60px);font-weight:700;line-height:1;text-transform:uppercase}
@@ -55,8 +55,7 @@ select:focus,input:focus{border-color:var(--amber)}
 label.fl{display:block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
 .hidden{display:none!important}
 .vehgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
-.veh{border:1px solid var(--line);border-radius:10px;background:var(--panel2);padding:14px;cursor:pointer;
-  text-align:center;transition:.15s}
+.veh{border:1px solid var(--line);border-radius:10px;background:var(--panel2);padding:14px;cursor:pointer;text-align:center;transition:.15s}
 .veh:hover{border-color:var(--amber)}
 .veh.on{border-color:var(--amber);background:#2e1c0c;box-shadow:0 0 0 1px var(--amber)}
 .veh svg{width:100%;height:72px}
@@ -86,11 +85,9 @@ label.fl{display:block;font-size:11px;color:var(--dim);text-transform:uppercase;
 .modal{position:fixed;inset:0;background:rgba(10,3,3,.78);z-index:100;display:none;align-items:center;justify-content:center;padding:18px}
 .modal.open{display:flex}
 .mbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:100%;max-width:460px;padding:24px;max-height:86vh;overflow:auto}
-.mbox h3{font-family:var(--fh);font-size:21px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;
-  display:flex;justify-content:space-between}
+.mbox h3{font-family:var(--fh);font-size:21px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;display:flex;justify-content:space-between}
 .mbox h3 button{background:none;border:none;color:var(--dim);font-size:22px;cursor:pointer}
-.reqitem{border:1px solid var(--line);border-radius:6px;padding:11px;margin-top:9px;display:flex;gap:9px;
-  align-items:center;font-size:13px;flex-wrap:wrap}
+.reqitem{border:1px solid var(--line);border-radius:6px;padding:11px;margin-top:9px;display:flex;gap:9px;align-items:center;font-size:13px;flex-wrap:wrap}
 .reqitem .sp{flex:1}
 .switch{display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer;user-select:none}
 .switch input{display:none}
@@ -98,8 +95,7 @@ label.fl{display:block;font-size:11px;color:var(--dim);text-transform:uppercase;
 .switch input:checked+.tr{background:var(--amber)}
 .switch .tr::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#140808;top:3px;left:3px;transition:.2s}
 .switch input:checked+.tr::after{left:21px}
-#toasts{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:200;display:flex;
-  flex-direction:column;gap:8px;width:min(420px,92vw)}
+#toasts{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;width:min(420px,92vw)}
 .toast{background:var(--panel2);border:1px solid var(--amber);border-radius:8px;padding:11px 15px;font-size:13px;animation:tin .25s}
 .toast.err{border-color:var(--red)}
 @keyframes tin{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
@@ -110,9 +106,6 @@ label.fl{display:block;font-size:11px;color:var(--dim);text-transform:uppercase;
 .note{font-size:12px;color:var(--dim);line-height:1.55;margin-top:12px;border-left:2px solid var(--line);padding-left:12px}
 footer{border-top:1px solid var(--line);padding:24px 18px;text-align:center;color:var(--dim);font-size:11.5px}
 </style>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
@@ -121,7 +114,7 @@ footer{border-top:1px solid var(--line);padding:24px 18px;text-align:center;colo
   <div class="sp"></div>
   <button class="btn sm" id="btnShare">Partager</button>
   <button class="btn sm acc" id="btnInstall">Installer</button>
-  <button class="btn sm" id="btnPack">Pack APK<span class="badge" id="badge"></span></button>
+  <button class="btn sm" id="btnPack">Pack APK</button>
   <button class="btn sm" id="btnAdmin">Admin</button>
 </header>
 
@@ -137,7 +130,6 @@ footer{border-top:1px solid var(--line);padding:24px 18px;text-align:center;colo
     </div>
   </div>
 
-  <!-- Étape 0 : type de véhicule pré-installé -->
   <div class="card">
     <h2><span class="n">00</span> Type de véhicule</h2>
     <div class="vehgrid" id="vehGrid">
@@ -162,7 +154,6 @@ footer{border-top:1px solid var(--line);padding:24px 18px;text-align:center;colo
     </div>
   </div>
 
-  <!-- Étape 1 : zones + cascade -->
   <div class="card">
     <h2><span class="n">01</span> Zones commerciales</h2>
     <div class="checks" id="regionChecks">
@@ -208,7 +199,7 @@ footer{border-top:1px solid var(--line);padding:24px 18px;text-align:center;colo
 
   <div class="card">
     <h2><span class="n">04</span> Mode sécurisé — contrôle des tiers</h2>
-    <p style="font-size:13px;color:var(--dim);line-height:1.6">Un tiers demande l'accès ; l'admin est notifié, accepte ou refuse, et peut révoquer à tout moment.</p>
+    <p style="font-size:13px;color:var(--dim);line-height:1.6">Un tiers demande l'accès ; l'admin est notifié, accepte ou refuse, et peut révoquer à tout moment. Synchronisé via Firebase.</p>
     <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
       <div style="flex:1;min-width:170px"><label class="fl">Votre nom (tiers)</label><input type="text" id="inpThird" placeholder="Nom du demandeur"></div>
       <button class="btn" id="btnRequest">Demander l'accès</button>
@@ -240,10 +231,9 @@ footer{border-top:1px solid var(--line);padding:24px 18px;text-align:center;colo
   <div class="mbox">
     <h3>Pack APK — PWABuilder <button data-close>×</button></h3>
     <p style="font-size:13px;color:var(--dim);line-height:1.65">
-      1. Les fichiers <b>index.html, manifest.json, sw.js, icon-512.svg</b> sont à la racine de votre dépôt GitHub.<br><br>
-      2. Activez GitHub Pages : Settings → Pages → branche <b>main</b> → votre URL HTTPS est prête.<br><br>
-      3. Sur <b>pwabuilder.com</b> : collez l'URL → Package for stores → Android → <b>Télécharger l'APK signé</b>.<br><br>
-      4. L'APK « Diag Kevin » s'installe sur Android ; l'icône SUV/Coupé/Moto choisie s'affiche à l'ouverture.
+      1. Fichiers <b>index.html, manifest.json, sw.js, icon-512.svg</b> à la racine du dépôt GitHub.<br><br>
+      2. GitHub Pages : Settings → Pages → branche <b>main</b> → URL HTTPS prête.<br><br>
+      3. Sur <b>pwabuilder.com</b> : collez l'URL → Package for stores → Android → <b>APK signé</b>.
     </p>
     <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
       <button class="btn acc" id="btnDlIndex">Télécharger index.html</button>
@@ -263,6 +253,46 @@ footer{border-top:1px solid var(--line);padding:24px 18px;text-align:center;colo
 <footer>Diag Kevin — aide au diagnostic. Rappels vérifiables sur RappelConso, Safety Gate, NHTSA et les sites constructeurs. Vérifiez toujours votre VIN chez le concessionnaire.</footer>
 
 <script>
+const $=id=>document.getElementById(id);
+const state={thirds:JSON.parse(localStorage.getItem("dk_grants")||"[]"),
+  requests:JSON.parse(localStorage.getItem("dk_reqs")||"[]"),admin:false};
+function toast(msg,err){const t=document.createElement("div");t.className="toast"+(err?" err":"");t.textContent=msg;
+  $("toasts").appendChild(t);setTimeout(()=>t.remove(),4000)}
+
+/* ============ FIREBASE : accès tiers partagé en temps réel ============ */
+firebase.initializeApp({
+  apiKey: "AIzaSyBFxUJrubgRtct17yTi4gCtBCZHn3c0Lkk",
+  authDomain: "kevin-diag.firebaseapp.com",
+  projectId: "kevin-diag",
+  storageBucket: "kevin-diag.firebasestorage.app",
+  messagingSenderId: "1081954267141",
+  appId: "1:1081954267141:web:d4ffea920c2ea5c480ec6c"
+});
+const db = firebase.firestore();
+const accessDoc = db.doc("access/state");
+async function loadAccess(){
+  try{
+    const snap=await accessDoc.get();
+    if(snap.exists){
+      state.thirds=snap.data().thirds||[];
+      state.requests=snap.data().requests||[];
+      myAccess();if(state.admin)renderAdmin();
+    }
+  }catch(e){/* hors ligne : repli localStorage */}
+}
+async function saveState(){
+  localStorage.setItem("dk_grants",JSON.stringify(state.thirds));
+  localStorage.setItem("dk_reqs",JSON.stringify(state.requests));
+  try{await accessDoc.set({thirds:state.thirds,requests:state.requests})}catch(e){}
+}
+accessDoc.onSnapshot(snap=>{
+  if(!snap.exists)return;
+  state.thirds=snap.data().thirds||[];
+  state.requests=snap.data().requests||[];
+  myAccess();if(state.admin)renderAdmin();
+});
+loadAccess();
+
 /* ============ DONNÉES ============ */
 const BRANDS=[
  {n:"Peugeot",r:"FR"},{n:"Citroën",r:"FR"},{n:"Renault",r:"FR"},{n:"Dacia",r:"FR"},{n:"DS Automobiles",r:"FR"},
@@ -278,7 +308,7 @@ const BRANDS=[
  {n:"Pontiac",r:"US"},{n:"Hummer",r:"US"},{n:"Tesla",r:"US"},{n:"Rivian",r:"US"},{n:"Lucid",r:"US"},
  {n:"Toyota",r:"AS"},{n:"Lexus",r:"AS"},{n:"Honda",r:"AS"},{n:"Nissan",r:"AS"},{n:"Infiniti",r:"AS"},
  {n:"Mazda",r:"AS"},{n:"Mitsubishi",r:"AS"},{n:"Suzuki",r:"AS"},{n:"Subaru",r:"AS"},{n:"Daihatsu",r:"AS"},
- {n:"Isuzu",r:"AS"},{n:"Kia",r:"AS"},{n:"Hyundai",r:"AS"},{n:"Genesis",r:"AS"},{n:"SsangYong",r:"AS"},
+ {n:"Isuzu",r:"AS"},{n:"Kia",r:"AS"},{n:"Hyundai",r:"AS"},{n:"Genesis",r:"AS"},
  {n:"Tata",r:"AS"},{n:"Mahindra",r:"AS"},{n:"Maruti Suzuki",r:"AS"},
  {n:"BYD",r:"AS"},{n:"MG",r:"AS"},{n:"NIO",r:"AS"},{n:"XPeng",r:"AS"},{n:"Li Auto",r:"AS"},{n:"Zeekr",r:"AS"},
  {n:"Geely",r:"AS"},{n:"Chery",r:"AS"},{n:"GWM / Ora",r:"AS"},{n:"Haval",r:"AS"},{n:"JAC",r:"AS"},
@@ -316,7 +346,8 @@ const CATALOG={
  "308 II":[["1.2 PureTech 130 Essence",1199,130],["1.5 BlueHDi 130 Diesel",1499,130],["PHEV 225 Hybride",1598,225]],
  "3008":[["1.2 PureTech 130 Essence",1199,130],["1.5 BlueHDi 130 Diesel",1499,130],["PHEV 300e Hybride",1598,300]],
  "2008":[["1.2 PureTech 100 Essence",1199,100],["e-2008 136ch Électrique",0,136]],
- "508":[["1.6 PureTech 180 Essence",1598,180],["1.5 BlueHDi 130 Diesel",1499,130],["PHEV 225 Hybride",1598,225]],
+  "508":[["1.6 PureTech 180 Essence",1598,180],["1.5 BlueHDi 130 Diesel",1499,130],["PHEV 225 Hybride",1598,225]],
+  
  "Partner":[["1.5 BlueHDi 100 Diesel",1499,100],["e-Partner Électrique",0,102]],
  "Boxer":[["2.2 BlueHDi 140 Diesel",2179,140]],
  "DS7 Crossback":[["1.6 PureTech 225 Essence",1598,225],["HEV 300 4x4 Hybride",1598,300]]
@@ -331,10 +362,10 @@ const CATALOG={
  "Jumper":[["2.2 HDi 130 Diesel",2179,130],["3.0 HDi 180 Diesel",2993,180]]
 }},
 "Volkswagen":{models:{
- "Golf 7":[["1.4 TSI 125 Essence",1395,125],["1.6 TDI 115 Diesel",1598,115],["2.0 TDI 150 Diesel",1968,150]],
+  "Golf 7":[["1.4 TSI 125 Essence",1395,125],["1.6 TDI 115 Diesel",1598,115],["2.0 TDI 150 Diesel",1968,150]],
  "Golf 8":[["1.5 TSI 130 Essence",1498,130],["1.5 eTSI 150 MHEV",1498,150],["2.0 TDI 150 Diesel",1968,150],["GTE 245 Hybride",1395,245]],
  "Polo VI":[["1.0 TSI 95 Essence",999,95],["1.6 TDI 95 Diesel",1598,95]],
-  "Passat B8":[["1.6 TDI 120 Diesel",1598,120],["2.0 TDI 150 Diesel",1968,150],["GTE 218 Hybride",1395,218]],
+ "Passat B8":[["1.6 TDI 120 Diesel",1598,120],["2.0 TDI 150 Diesel",1968,150],["GTE 218 Hybride",1395,218]],
  "Tiguan":[["1.4 TSI 150 Essence",1395,150],["2.0 TDI 150 Diesel",1968,150]],
  "T-Roc":[["1.0 TSI 110 Essence",999,110],["1.5 TSI 150 Essence",1498,150]],
  "ID.3":[["Pro 58 kWh Électrique",0,204]],
@@ -369,7 +400,7 @@ const CATALOG={
 }},
 "Ford":{models:{
  "Fiesta VIII":[["1.1 85 Essence",1084,85],["1.0 EcoBoost 100 Essence",999,100],["1.5 TDCi 85 Diesel",1499,85]],
- "Focus IV":[["1.0 EcoBoost 125 Essence",999,100],["1.5 EcoBlue 120 Diesel",1499,120]],
+ "Focus IV":[["1.0 EcoBoost 125 Essence",999,125],["1.5 EcoBlue 120 Diesel",1499,120]],
  "Puma":[["1.0 EcoBoost Hybrid 125 MHEV",999,125]],
  "Kuga":[["1.5 EcoBoost 150 Essence",1498,150],["2.5 PHEV 225 Hybride",2488,225]],
  "Mustang":[["5.0 V8 449 Essence",5038,449],["2.3 EcoBoost 290 Essence",2261,290]]
@@ -378,44 +409,41 @@ const CATALOG={
  "Model 3":[["Standard Range Électrique",0,283],["Long Range AWD Électrique",0,498],["Performance Électrique",0,513]],
  "Model Y":[["Propulsion Électrique",0,299],["Long Range AWD Électrique",0,514]],
  "Model S":[["Long Range Électrique",0,670]]
-}},
-"BMW Moto":{models:{}}
+}}
 };
 const MOTO_CATALOG={
  "Yamaha":{"MT-07":[["CP2 689 cm³ 73ch",689,73]],"MT-09":[["CP3 890 cm³ 119ch",890,119]],"MT-03":[["321 cm³ 42ch",321,42]]},
- "Kawasaki":{"Z650":[["649 cm³ 68ch",649,68]],"Z900":[["948 cm³ 125ch",948,125]],"Z900":[["948 cm³ 125ch",948,125]]},
- "Honda":{"CB650R":[["649 cm³ 95ch",649,95]],"CB500F":[["471 cm³ 47ch",471,47]],"CB1000R":[["998 cm³ 143ch",998,143]]},
+ "Kawasaki":{"Z650":[["649 cm³ 68ch",649,68]],"Z900":[["948 cm³ 125ch",948,125]]},
+ "Honda Moto":{"CB500F":[["471 cm³ 47ch",471,47]],"CB650R":[["649 cm³ 95ch",649,95]],"CB1000R":[["998 cm³ 143ch",998,143]]},
  "Ducati":{"Monster":[["937 cm³ 111ch",937,111]],"Streetfighter V2":[["955 cm³ 153ch",955,153]]},
  "KTM":{"Duke 390":[["399 cm³ 45ch",399,45]],"Duke 790":[["799 cm³ 105ch",799,105]],"Duke 990":[["947 cm³ 123ch",947,123]]},
  "BMW":{"F 900 R":[["895 cm³ 105ch",895,105]],"S 1000 R":[["999 cm³ 207ch",999,207]]},
  "Suzuki":{"SV650":[["645 cm³ 76ch",645,76]],"GSX-S950":[["999 cm³ 143ch",999,143]]},
  "Triumph":{"Street Triple 765":[["765 cm³ 130ch",765,130]]}
 };
-/* Motorisations génériques pour marques sans catalogue */
 const GEN={
  FR:[["1.2 Turbo 100 Essence",1199,100],["1.5 Diesel 115",1499,115],["Électrique 136ch",0,136]],
  EU:[["1.4 Turbo 150 Essence",1395,150],["2.0 Diesel 150",1968,150],["PHEV 225 Hybride",1598,225],["Électrique 204ch",0,204]],
  US:[["3.6 V6 Essence",3564,305],["5.0 V8 Essence",5038,460],["Électrique 340ch",0,340]],
  AS:[["1.5 Essence 120",1497,120],["1.8 Hybride 140",1798,140],["Électrique 150ch",0,150]]
 };
-/* Filtre par type de véhicule pré-installé */
 const VTYPE={
  SUV:{kw:["SUV","3008","2008","Tiguan","T-Roc","Captur","Kadjar","Austral","C5 Aircross","C3 Aircross","RAV4","C-HR","Yaris Cross","Kuga","Puma","X3","X5","GLC","Duster","Espace","Scénic","5008","Model Y","EQC","ID.4","Aircross","Crossback"],
       brands:["Land Rover","Jeep","Dacia","GWM / Ora","Haval","SsangYong","Maxus","Voyah"]},
- COUPE:{kw:["Coupé","Mustang","A110","Alpine","Z4","Ferrari","Porsche","Lamborghini","Aston","McLaren","Lotus","Mustang","Arteon","Série 8"],
+ COUPE:{kw:["Coupé","Mustang","A110","Alpine","Z4","Ferrari","Porsche","Lamborghini","Aston","McLaren","Lotus","Arteon"],
       brands:["Ferrari","Lamborghini","Porsche","Aston Martin","McLaren","Lotus","Alpine","Bugatti","Bentley","Rolls-Royce","Genesis"]},
- MOTO:{kw:["MT-","Z650","Z900","CB","Duke","Monster","Streetfighter","SV650","Street Triple","S 1000 R","F 900"],brands:["Yamaha","Kawasaki","Honda Moto","Ducati","KTM","Triumph"]}
+ MOTO:{kw:["MT-","Z650","Z900","CB","Duke","Monster","Streetfighter","SV650","Street Triple","S 1000 R","F 900"],
+      brands:["Yamaha","Kawasaki","Honda Moto","Ducati","KTM","Triumph"]}
 };
 function currentVType(){const el=document.querySelector(".veh.on");return el?el.dataset.v:"ALL"}
 function brandMatchesType(brand){
-  const t=currentVType(); if(t==="ALL")return true;
-  const spec=VTYPE[t]; if(!spec)return true;
+  const t=currentVType();if(t==="ALL")return true;
+  const spec=VTYPE[t];if(!spec)return true;
   if(spec.brands.includes(brand))return true;
   const models=CATALOG[brand]?Object.keys(CATALOG[brand].models):[];
   return models.some(m=>spec.kw.some(k=>m.toLowerCase().includes(k.toLowerCase())));
 }
 function modelsFor(brand){
-  if(brand==="Honda Moto")return {"CB500F":[["471 cm³ 47ch",471,47]],"CB650R":[["649 cm³ 95ch",649,95]]};
   if(MOTO_CATALOG[brand])return MOTO_CATALOG[brand];
   if(CATALOG[brand])return CATALOG[brand].models;
   return null;
@@ -486,11 +514,10 @@ function buildMaintenance(m,e){
     isEV?{i:"Liquide refroidissement batterie HV",p:"4 ans",k:"80 000 km"}
         :{i:"Liquide de refroidissement moteur",p:"4 ans",k:"100 000 km puis 60 000"},
     {i:"Liquide de frein",p:"2 ans",k:"40 000 km"},
-    {i:"Vidange "+(bva?"boîte automatique / EDC":"boîte manuelle"),p:bva?"5 ans":"6 ans",k:bva?"60 000 km":"120 000 km (si huile non à vie)"},
+    {i:"Vidange "+(bva?"boîte automatique / EDC":"boîte manuelle"),p:bva?"5 ans":"6 ans",k:bva?"60 000 km":"120 000 km"},
     {i:"Huile de pont / transmission (propulsion, 4x4)",p:"6 ans",k:"100 000 km"},
-    {i:"Huile boîte de transfert (4x4)",p:"6 ans",k:"100 000 km"},
     dist?{i:"Courroie de distribution",p:"10 ans",k:"175 000 km (PureTech : contrôle dès 100 000 km)"}
-        :isEV?null:{i:"Chaîne de distribution",p:"À vie",k:"Contrôle à chaque entretien — remplacement si allongement"},
+        :isEV?null:{i:"Chaîne de distribution",p:"À vie",k:"Contrôle à chaque entretien"},
     {i:"Plaquettes de frein avant",p:"—",k:"30 000–60 000 km"},
     {i:"Batterie 12V",p:"4–5 ans",k:"—"},
     isEV?{i:"Contrôle charge / SOH batterie",p:"Annuel",k:"—"}:null
@@ -520,8 +547,7 @@ function lookupCode(code){
   if(CODES[c])return{...CODES[c],code:code.toUpperCase()};
   const m=c.match(/^([pcbu])(\d{4})$/);
   if(m){const fam={p:"Groupe motopropulseur",c:"Châssis/ABS",b:"Carrosserie/airbag",u:"Réseau/communication"}[m[1]];
-    return{code:code.toUpperCase(),f:`Code fam{fam}fam{(+m[2].slice(1)<0x30?"générique":"propre constructeur")}`,
-      c:"Non référencé en base locale — utilisez la recherche Gemini ou les liens officiels",s:fam}}
+    return{code:code.toUpperCase(),f:`Code ${fam}`,c:"Non référencé en base locale — utilisez la recherche Gemini ou les liens officiels",s:fam}}
   return null}
 function officialLinks(b,m){
   const q=encodeURIComponent(b+" "+m);
@@ -533,60 +559,15 @@ function officialLinks(b,m){
    {n:"Site constructeur",u:`https://www.google.com/search?q=${encodeURIComponent(b+" "+m+" recall campagnes")}`,d:"Campagnes constructeur"}]}
 
 /* ============ UI ============ */
-const $=id=>document.getElementById(id);/* ============ FIREBASE : accès tiers partagé en temps réel ============ */
-firebase.initializeApp({
-  apiKey: "AIzaSyBFxUJrubgRtct17yTi4gCtBCZHn3c0Lkk",
-  authDomain: "kevin-diag.firebaseapp.com",
-  projectId: "kevin-diag",
-  storageBucket: "kevin-diag.firebasestorage.app",
-  messagingSenderId: "1081954267141",
-  appId: "1:1081954267141:web:d4ffea920c2ea5c480ec6c"
-});
-const db = firebase.firestore();
-const accessDoc = db.doc("access/state");
-
-/* Charge l'état des accès depuis Firestore */
-async function loadAccess(){
-  try{
-    const snap = await accessDoc.get();
-    if(snap.exists){
-      state.thirds = snap.data().thirds||[];
-      state.requests = snap.data().requests||[];
-      myAccess();
-      if(state.admin) renderAdmin();
-    }
-  }catch(e){ /* hors ligne : repli localStorage */ }
-}
-/* Sauvegarde centralisée (remplace l'ancienne fonction saveState) */
-async function saveState(){
-  localStorage.setItem("dk_grants",JSON.stringify(state.thirds));
-  localStorage.setItem("dk_reqs",JSON.stringify(state.requests));
-  try{ await accessDoc.set({thirds:state.thirds,requests:state.requests}) }catch(e){}
-}
-/* Temps réel : acceptation/refus visible instantanément partout */
-accessDoc.onSnapshot(snap=>{
-  if(!snap.exists)return;
-  state.thirds=snap.data().thirds||[];
-  state.requests=snap.data().requests||[];
-  myAccess();
-  if(state.admin)renderAdmin();
-});
-loadAccess();
-  
-const state={thirds:JSON.parse(localStorage.getItem("dk_grants")||"[]"),
-  requests:JSON.parse(localStorage.getItem("dk_reqs")||"[]"),admin:false};
-function toast(msg,err){const t=document.createElement("div");t.className="toast"+(err?" err":"");t.textContent=msg;
-  $("toasts").appendChild(t);setTimeout(()=>t.remove(),4000)}
-
-/* Compteur de fiches (>21 000) */
+/* Compteur de fiches */
 (function(){
   let f=0;Object.values(CATALOG).forEach(b=>Object.values(b.models).forEach(mdls=>f+=mdls.length*5+2));
   Object.values(MOTO_CATALOG).forEach(b=>Object.keys(b).forEach(m=>f+=4));
-  const others=BRANDS.filter(b=>!CATALOG[b.n]).length;f+=others*6;
+  const others=BRANDS.filter(b=>!CATALOG[b.n]&&!MOTO_CATALOG[b.n]).length;f+=others*6;
   f=Math.max(f,21500);
   let cur=0;const iv=setInterval(()=>{cur=Math.min(f,cur+Math.ceil(f/60));
     $("stFiches").textContent=cur.toLocaleString("fr-FR");if(cur>=f)clearInterval(iv)},25);
-  $("stMarques").textContent=BRANDS.length;
+  $("stMar").textContent=BRANDS.length;
   $("stCodes").textContent=Object.keys(CODES).length;
 })();
 
@@ -603,18 +584,15 @@ if(localStorage.getItem("dk_veh")){
 function refreshBrands(){
   const t=currentVType();
   const zones=[...document.querySelectorAll("#regionChecks input:checked")].map(i=>i.value);
-  if(t==="MOTO"&&!zones.includes("AS"))zones.push("AS");
   const sel=$("selBrand");sel.innerHTML='<option value="">— Choisir une marque —</option>';
-  zones.forEach(z=>{
-    const list=BRANDS.filter(b=>b.r===z&&brandMatchesType(b.n)&&(!CATALOG[b.n]||Object.keys(CATALOG[b.n].models).length));
-    if(t==="MOTO")return; // moto : liste dédiée ci-dessous
+  if(t==="MOTO"){const g=document.createElement("optgroup");g.label="Motos (roadster)";
+    Object.keys(MOTO_CATALOG).forEach(b=>{const o=document.createElement("option");o.value=b;o.textContent=b;g.appendChild(o)});
+    sel.appendChild(g)}
+  else zones.forEach(z=>{
+    const list=BRANDS.filter(b=>b.r===z&&brandMatchesType(b.n)&&CATALOG[b.n]);
     const g=document.createElement("optgroup");g.label={FR:"Françaises",EU:"Européennes",US:"Américaines",AS:"Asiatiques / Chinoises"}[z];
     list.sort((a,b)=>a.n.localeCompare(b.n)).forEach(b=>{const o=document.createElement("option");o.value=b.n;o.textContent=b.n;g.appendChild(o)});
     if(g.children.length)sel.appendChild(g)});
-  if(t==="MOTO"){const g=document.createElement("optgroup");g.label="Motos (roadster)";
-    Object.keys(MOTO_CATALOG).forEach(b=>{const o=document.createElement("option");o.value=b;o.textContent=b;g.appendChild(o)});
-    const h=document.createElement("option");h.value="Honda Moto";h.textContent="Honda (motos)";g.prepend(h);
-    sel.appendChild(g)}
   ("selModel").innerHTML=′<optionvalue="">Seˊlectionnezunemarque</option>′;("selModel").innerHTML='<option value="">Sélectionnez une marque</option>';("selModel").innerHTML=′<optionvalue="">Seˊlectionnezunemarque</option>′;("selModel").disabled=true;
   ("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").innerHTML='<option value="">Sélectionnez un modèle</option>';("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").disabled=true;
 }
@@ -624,34 +602,34 @@ $("selBrand").addEventListener("change",()=>{
   const models=modelsFor(b);
   if(models){sel.innerHTML='<option value="">— Choisir un modèle —</option>';
     Object.keys(models).sort().forEach(m=>{const o=document.createElement("option");o.value=m;o.textContent=m;sel.appendChild(o)})}
-  else{sel.innerHTML='<option value="">— Modèle (saisie libre) —</option><option value="__custom">Autre modèle</option>'}
+  else{sel.innerHTML='<option value="__custom">— Modèle (saisie libre) —</option>'}
   ("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").innerHTML='<option value="">Sélectionnez un modèle</option>';("selEngine").innerHTML=′<optionvalue="">Seˊlectionnezunmodeˋle</option>′;("selEngine").disabled=true;
 });
 $("selModel").addEventListener("change",()=>{
   const b=("selBrand").value,m=("selBrand").value,m=("selBrand").value,m=("selModel").value,sel=$("selEngine");
   sel.innerHTML="";sel.disabled=false;
   const models=modelsFor(b),engs=models?models[m]:null;
-  if(engs)engs.forEach(e=>{const o=document.createElement("option");o.textContent=e[0];o.dataset.cc=e[1];o.dataset.pw=e[2];sel.appendChild(o)});
-  else enginesFor(b)?.forEach(e=>{const o=document.createElement("option");o.textContent=e[0];sel.appendChild(o)});
+  if(engs)engs.forEach(e=>{const o=document.createElement("option");o.textContent=e[0];sel.appendChild(o)});
+  else GEN[BRANDS.find(x=>x.n===b)?.r||"EU"].forEach(e=>{const o=document.createElement("option");o.textContent=e[0];sel.appendChild(o)});
 });
 
 /* Analyse */
 $("btnAnalyze").addEventListener("click",()=>{
   const b=("selBrand").value,m=("selBrand").value,m=("selBrand").value,m=("selModel").value,e=$("selEngine").value;
   if(!b||!e){toast("Choisissez une marque, un modèle et une motorisation",true);return}
-  const model=m==="__custom"?$("selModel").selectedOptions[0].textContent:m;
+  const model=m==="__custom"?"Modèle personnalisé":m;
   const vt={SUV:"SUV",COUPE:"Coupé sport",MOTO:"Moto roadster"}[currentVType()]||"Véhicule";
   ("resTitle").textContent=‘("resTitle").textContent=`("resTitle").textContent=‘{b} model—{model} —model—{e} (${vt})`;
   const faults=buildFaults(b,model,e),recalls=buildRecalls(b,model,e);
   $("tab-faults").innerHTML=faults.map(f=>`
     <div class="fault"><h4><span class="sysTag f.sys.cls">{f.sys.cls}">f.sys.cls">{f.sys.t}</span>${f.title}
       <span class="pill f.sev">{f.sev}">f.sev">{f.sev==="hi"?"Critique":f.sev==="md"?"Modéré":"Mineur"}</span></h4>
-      <p>f.freq⋅Apparitiontypiquevers{f.freq} · Apparition typique versf.freq⋅Apparitiontypiquevers{f.km.toLocaleString("fr-FR")} km · Coût indicatif ≈ ${f.cost} €. Recoupez avec le carnet d'entretien et les rappels.</p></div>`).join("");
+      <p>f.freq⋅Apparitiontypiquevers{f.freq} · Apparition typique versf.freq⋅Apparitiontypiquevers{f.km.toLocaleString("fr-FR")} km · Coût indicatif ≈ ${f.cost} €</p></div>`).join("");
   $("tab-recalls").innerHTML=recalls.map(r=>`
     <div class="fault"><h4><span class="sysTag r.cls">Rappel{r.cls}">Rappelr.cls">Rappel{r.ref}</span>${r.title}
       <span class="pill r.sev==="Grave"?"hi":r.sev==="Modeˊreˊ"?"md":"lo"">{r.sev==="Grave"?"hi":r.sev==="Modéré"?"md":"lo"}">r.sev==="Grave"?"hi":r.sev==="Modeˊreˊ"?"md":"lo"">{r.sev}</span></h4>
       <p>Vérifiez l'éligibilité de votre VIN sur les sources officielles :</p></div>`).join("")
-    +`<div class="srcgrid">{officialLinks(b,model).map(l=>`<a class="srclink" target="_blank" rel="noopener" href="{l.u}"><b>l.n</b><span>{l.n}</b><span>l.n</b><span>{l.d}</span></a>`).join("")}</div>`;
+        +`<div class="srcgrid">{officialLinks(b,model).map(l=>`<a class="srclink" target="_blank" rel="noopener" href="{l.u}"><b>l.n</b><span>{l.n}</b><span>l.n</b><span>{l.d}</span></a>`).join("")}</div>`;
   $("tab-maint").innerHTML=`<table class="tbl"><tr><th>Opération</th><th>Périodicité</th><th>Kilométrage</th></tr>
     {buildMaintenance(model,e).map(x=>`<tr><td>{x.i}</td><td>x.p</td><td><b>{x.p}</td><td><b>x.p</td><td><b>{x.k}</b></td></tr>`).join("")}</table>
     <div class="note">Valeurs indicatives — recoupez avec le carnet constructeur (usage sévère : diviser les kilométrages par 2).</div>`;
@@ -694,7 +672,6 @@ $("btnCode").addEventListener("click",async()=>{
 $("aiKeyState").textContent=localStorage.getItem("dk_gemini")?"— clé enregistrée":"— aucune clé";
 
 /* Tiers / admin */
-
 function myAccess(){
   const me=state.thirds.find(t=>t.status==="granted");
   ("myAccess").innerHTML=me?‘<spanstyle="color:var(−−green);font−weight:600">✔Acceˋsaccordeˊ</span>—«("myAccess").innerHTML=me?`<span style="color:var(--green);font-weight:600">✔ Accès accordé</span> — «("myAccess").innerHTML=me?‘<spanstyle="color:var(−−green);font−weight:600">✔Acceˋsaccordeˊ</span>—«{me.name} » (révocable par l'admin à tout moment)`
@@ -719,9 +696,6 @@ function renderAccess(){
   if(pend.length){$("mdAccess").classList.add("open");
     if("Notification" in window&&Notification.permission==="granted")
       new Notification("Diag Kevin",{body:pend.length+" demande(s) d'accès en attente"})}}
-window.decide=(name,ok)=>{
-  const r=state.requests.find(x=>x.name===name);if(r)r.status=ok?"granted":"denied";
-  if(ok&&!state.thirds.some(t=>t.name
 window.decide=(name,ok)=>{
   const r=state.requests.find(x=>x.name===name);if(r)r.status=ok?"granted":"denied";
   if(ok&&!state.thirds.some(t=>t.name===name))state.thirds.push({name,status:"granted",ts:Date.now()});
@@ -789,7 +763,7 @@ $("btnDlIcon").addEventListener("click",()=>fetch("./icon-512.svg").then(r=>r.te
 document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{
   if(e.target===m||e.target.hasAttribute("data-close"))m.classList.remove("open")}));
 
-/* Service worker + cycle hebdo */
+/* Service worker + notifications Firebase temps réel */
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("./sw.js").then(reg=>{
     setInterval(()=>reg.active?.postMessage("CHECK_WEEKLY"),3600000);
@@ -806,3 +780,5 @@ if(state.requests.filter(r=>r.status==="pending").length)setTimeout(renderAccess
 </script>
 </body>
 </html>
+
+
