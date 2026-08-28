@@ -248,7 +248,15 @@ footer{border-top:1px solid var(--line);padding:24px 18px;text-align:center;colo
   <h3>Demande d'accès tiers <button data-close>×</button></h3><div id="accessBody"></div>
 </div></div>
 
-<div id="toasts"></div>
+<div id="toasts"></div><div id="errbox" style="position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#7a1010;color:#fff;font:11px monospace;padding:8px;max-height:45%;overflow:auto;white-space:pre-wrap;display:none"></div>
+<script>
+window.onerror=function(msg,src,line){
+  const b=document.getElementById("errbox");
+  b.style.display="block";
+  b.textContent+="⛔ ligne "+line+" : "+msg+"\n";
+};
+</script>
+  
 
 <footer>Diag Kevin — aide au diagnostic. Rappels vérifiables sur RappelConso, Safety Gate, NHTSA et les sites constructeurs. Vérifiez toujours votre VIN chez le concessionnaire.</footer>
 
