@@ -346,7 +346,7 @@ const CATALOG={
  "308 II":[["1.2 PureTech 130 Essence",1199,130],["1.5 BlueHDi 130 Diesel",1499,130],["PHEV 225 Hybride",1598,225]],
  "3008":[["1.2 PureTech 130 Essence",1199,130],["1.5 BlueHDi 130 Diesel",1499,130],["PHEV 300e Hybride",1598,300]],
  "2008":[["1.2 PureTech 100 Essence",1199,100],["e-2008 136ch Électrique",0,136]],
-  "508":[["1.6 PureTech 180 Essence",1598,180],["1.5 BlueHDi 130 Diesel",1499,130],["PHEV 225 Hybride",1598,225]],
+ "508":[["1.6 PureTech 180 Essence",1598,180],["1.5 BlueHDi 130 Diesel",1499,130],["PHEV 225 Hybride",1598,225]],
   
  "Partner":[["1.5 BlueHDi 100 Diesel",1499,100],["e-Partner Électrique",0,102]],
  "Boxer":[["2.2 BlueHDi 140 Diesel",2179,140]],
@@ -567,7 +567,8 @@ function officialLinks(b,m){
   f=Math.max(f,21500);
   let cur=0;const iv=setInterval(()=>{cur=Math.min(f,cur+Math.ceil(f/60));
     $("stFiches").textContent=cur.toLocaleString("fr-FR");if(cur>=f)clearInterval(iv)},25);
-  $("stMar").textContent=BRANDS.length;
+    $("stMarques").textContent=BRANDS.length;
+  
   $("stCodes").textContent=Object.keys(CODES).length;
 })();
 
